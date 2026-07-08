@@ -4,8 +4,10 @@ import { create } from "zustand";
 interface UserStore {
   user: User | null;
   token: string | null;
+  isAuthLoading: boolean;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
+  setIsAuthLoading: (isAuthLoading: boolean) => void;
   clearAuth: () => void;
 }
 
@@ -46,6 +48,7 @@ const getStoredToken = (): string | null => {
 export const useUserStore = create<UserStore>((set) => ({
   user: getStoredUser(), // set the user from session storage
   token: getStoredToken(), // set the token from session storage
+  isAuthLoading: false,
 
   setUser: (user) => {
     // if user is not null, stringify it, otherwise pass null itself
@@ -60,6 +63,8 @@ export const useUserStore = create<UserStore>((set) => ({
     setSessionStorageKey(SESSION_STORAGE_KEYS.token, token);
     set({ token });
   },
+
+  setIsAuthLoading: (isAuthLoading) => set({ isAuthLoading }),
 
   clearAuth: () => {
     setSessionStorageKey(SESSION_STORAGE_KEYS.user, null);

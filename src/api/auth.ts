@@ -1,5 +1,11 @@
 import api from "@/lib/axios";
-import type { LoginPayload, User, LoginResponse, LogoutResponse } from "@/types/auth";
+import type {
+  LoginPayload,
+  User,
+  LoginResponse,
+  GetProfileResponse,
+  LogoutResponse,
+} from "@/types/auth";
 
 export async function login(
   payload: LoginPayload,
@@ -26,4 +32,14 @@ export async function logout(): Promise<string> {
   }
 
   return message;
+}
+
+export async function getProfile(): Promise<User> {
+  const response = await api.get<GetProfileResponse>("/api/auth/profile");
+
+  const { success, message, data } = response.data;
+
+  if (!success) throw new Error(message);
+
+  return data;
 }
