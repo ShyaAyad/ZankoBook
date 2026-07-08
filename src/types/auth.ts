@@ -1,5 +1,7 @@
 import type { ApiResponse } from "@/types/api";
 
+export type UserRole = "STUDENT" | "LECTURER";
+
 export interface ScopeUniversity {
   id: number;
   name: string;
@@ -19,15 +21,11 @@ export interface ScopeDepartment {
 
 export type ScopeEntity = ScopeUniversity | ScopeFaculty | ScopeDepartment;
 
-export type UserScopeType =
-  | "MINISTRY"
-  | "UNIVERSITY"
-  | "FACULTY"
-  | "DEPARTMENT";
+export type UserScopeType = "UNIVERSITY" | "FACULTY" | "DEPARTMENT";
 
 export interface UserRoleEntry {
   id: number;
-  name: string;
+  name: UserRole;
 }
 
 export interface UserScopeEntry {
