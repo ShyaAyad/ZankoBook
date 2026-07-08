@@ -55,3 +55,4 @@ export interface LoginPayload {
 }
 
 export type LoginResponse = ApiResponse<{ user: User; token: string }>;
+export type LogoutResponse = ApiResponse<null>;
