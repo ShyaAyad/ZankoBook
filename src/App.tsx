@@ -1,6 +1,7 @@
 import "@/App.css";
 import AppLayout from "./Layout/AppLayout";
 import { Routes, Route } from "react-router-dom";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   return (
@@ -9,7 +10,7 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" />
           <Route path="/requests" />
-          <Route path="/profile" />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </>
