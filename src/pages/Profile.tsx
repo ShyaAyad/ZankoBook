@@ -29,8 +29,7 @@ const Profile = () => {
       navigate("/login", { replace: true });
     },
     onError: () => {
-      clearAuth();
-      navigate("/login", { replace: true });
+      console.error("Couldn't logout!");
     },
   });
 
