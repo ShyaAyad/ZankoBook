@@ -1,77 +1,75 @@
-# ZankoBook
+# React + TypeScript + Vite
 
-A learning and course management system. ZankoBook lets lecturers manage course materials, grades, attendance, and assignment deadlines, while students access materials, submit assignments, and track their own academic progress.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-This repository contains the frontend for ZankoBook, one of the modules under the broader Zankolink platform (alongside e-Zanko and Zankoline).
+Currently, two official plugins are available:
 
-## Tech Stack
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS, Shadcn/ui, TanStack Query, React Router DOM, Zustand
-- **Backend:** Laravel (REST API), Laravel Sanctum for authentication
-- **Database:** MySQL
-- **API testing:** Hoppscotch
-- **Task tracking:** Jira
+## React Compiler
 
-## Getting Started
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-### Prerequisites
+## Expanding the ESLint configuration
 
-- Node.js 18 or higher
-- npm
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-### Setup
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-```bash
-git clone https://github.com/ShyaAyad/ZankoBook
-cd zankobook
-npm install
-cp .env.example .env
-```
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-Fill in `.env` with the required values (see `.env.example` for the full list).
-
-### Running locally
-
-```bash
-npm run dev
-```
-
-The app runs at `http://localhost:5173` by default.
-
-### Building for production
-
-```bash
-npm run build
-```
-
-Output is generated in the `dist/` folder.
-
-## Project Structure
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 
 ```
-src/
-├── api/              # functions that call backend endpoints
-├── components/
-│   ├── ui/            # Shadcn generated components (do not edit manually)
-│   └── common/         # shared custom components
-├── layouts/           # AppLayout, AuthLayout
-├── pages/             # one folder per route
-├── store/             # Zustand stores
-├── types/              # shared TypeScript types
-├── lib/                 # axios instance, query client, utilities
+
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
 ```
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for branching strategy, commit conventions, and PR rules before opening any pull request.
-
-## Roles in the System
-
-| Role       | Scope                                                                                   |
-|------------|------------------------------------------------------------------------------------------|
-| Lecturer   | Uploads course materials, tracks grades and attendance, sets assignment deadlines, submits requests to their department |
-| Student    | Accesses course materials, uploads assignments, views their own grades and attendance    |
-
-## License
-
-Internal academic/internship project — not licensed for external use.
