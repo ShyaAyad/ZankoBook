@@ -1,3 +1,5 @@
+import type { ApiResponse } from "@/types/api";
+
 export interface ScopeUniversity {
   id: number;
   name: string;
@@ -48,3 +50,10 @@ export interface User {
   created_at: string;
   updated_at: string;
 }
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export type LoginResponse = ApiResponse<{ user: User; token: string }>;
