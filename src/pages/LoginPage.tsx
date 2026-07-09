@@ -17,7 +17,7 @@ const LoginPage = () => {
   const setUser = useUserStore((state) => state.setUser);
   const setToken = useUserStore((state) => state.setToken);
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (payload: LoginPayload) => login(payload),
     onSuccess: (data) => {
       setUser(data.user);
@@ -151,9 +151,9 @@ const LoginPage = () => {
 
             <Button
               type="submit"
-              className="h-12 w-full rounded-xl bg-teal-200 text-base font-bold text-teal-700 shadow-sm transition-colors hover:bg-teal-200 hover:text-teal-500"
+              className={`h-12 w-full rounded-xl bg-teal-200 text-base font-bold text-teal-700 shadow-sm transition-colors hover:bg-teal-200 hover:text-teal-500 ${isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
             >
-              {t("Sign in")}
+              {isPending ? t("Signing in...") : t("Sign in")}
             </Button>
           </form>
         </div>
