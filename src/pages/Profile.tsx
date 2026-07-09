@@ -63,7 +63,7 @@ const Profile = () => {
       {/* logout */}
       <button
         onClick={handleLogout}
-        className="w-full flex items-center justify-center gap-2 text-red-400 border border-red-300 shadow-md px-5 py-3 rounded-lg my-3 hover:bg-red-50 transition-colors"
+        className="w-full flex items-center justify-center gap-2 text-red-400 border border-red-300 shadow-md px-5 py-3 rounded-lg my-3 hover:bg-red-50 transition-colors cursor-pointer"
       >
         <LogOut size={18} />
         {isPending ? <p>{t("Logging out...")}</p> : <p>{t("Log Out")}</p>}
