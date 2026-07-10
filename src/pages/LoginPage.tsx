@@ -22,7 +22,7 @@ const LoginPage = () => {
     onSuccess: (data) => {
       setUser(data.user);
       setToken(data.token);
-      navigate("/");
+      navigate("/", { replace: true });
     },
     onError: (error) => {
       console.error(error);
