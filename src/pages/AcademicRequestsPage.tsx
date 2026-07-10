@@ -2,39 +2,16 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import RequestCard from "@/components/common/AcademicRequestCard";
 import AcademicRequestModal from "@/components/common/AcademicRequestModal";
-import type { AcademicRequest } from "@/types/academicRequests";
-
-const requests: AcademicRequest[] = [
-  {
-    id: 1,
-    type: "type",
-    status: "approved",
-    subject: "title",
-    description: "description",
-    created_at: "date",
-    updated_at: "date",
-    attachments: [
-      {
-        id: 1,
-        file_name: "file name",
-        file_url: "file url",
-        file_size: 1,
-        file_type: "file type",
-      },
-    ],
-    user: {
-      id: 0,
-      name: "fllan user",
-    },
-    department: {
-      id: 0,
-      name: "fisar department",
-    },
-  },
-];
+import { getAcademicRequests } from "@/api/academicRequests";
+import { useQuery } from "@tanstack/react-query";
 
 const AcademicRequestsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data: requests } = useQuery({
+    queryKey: ["academic-requests"],
+    queryFn: getAcademicRequests,
+  });
 
   return (
     <div className="p-8">
@@ -55,7 +32,7 @@ const AcademicRequestsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {requests.map((request) => (
+        {requests?.map((request) => (
           <RequestCard
             key={request.id}
             type={request.type}

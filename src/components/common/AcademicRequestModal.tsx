@@ -1,10 +1,11 @@
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Paperclip, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeAcademicRequest } from "@/api/academicRequests";
 import { notifySuccess } from "@/lib/toast";
+import type { AcademicRequestPayload } from "@/types/academicRequests";
 
 export type AcademicRequestType =
   | "leave"
@@ -20,13 +21,6 @@ const REQUEST_TYPES: { value: AcademicRequestType; label: string }[] = [
   { value: "complaint", label: "Complaint" },
   { value: "other", label: "Other" },
 ];
-
-export interface AcademicRequestPayload {
-  type: AcademicRequestType;
-  subject: string;
-  description: string;
-  attachments: File[];
-}
 
 interface AcademicRequestModalProps {
   onClose: () => void;
@@ -46,7 +40,7 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
   const [type, setType] = useState<AcademicRequestType>("leave");
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
-  const [attachments, setAttachments] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
 
   const isValid = subject.trim().length > 0 && description.trim().length > 0;
 
@@ -60,21 +54,19 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
     },
   });
 
-  function handleFilesSelected(e: ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    setAttachments((prev) => [...prev, ...Array.from(files)]);
-    notifySuccess(
-      files.length === 1
-        ? t("1 file added")
-        : t("{{count}} files added", { count: files.length }),
-    );
-    e.target.value = ""; // allow re-selecting the same file later
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files) {
+      setFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+      notifySuccess(
+        files.length === 1
+          ? t("1 file added")
+          : t("{{count}} files added", { count: files.length }),
+      );
+    }
   }
 
-  function removeAttachment(index: number) {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  function removeFile(index: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   }
 
   function handleSubmit(e: FormEvent) {
@@ -85,7 +77,7 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
       type,
       subject: subject.trim(),
       description: description.trim(),
-      attachments,
+      files,
     });
   }
 
@@ -181,18 +173,19 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-gray-700">
               {t("Attachments")}
-              {attachments.length > 0 && (
+              {files.length > 0 && (
                 <span className="ms-1 font-normal text-gray-400">
-                  ({attachments.length})
+                  ({files.length})
                 </span>
               )}
             </label>
 
             <input
               ref={fileInputRef}
+              name="files"
               type="file"
               multiple
-              onChange={handleFilesSelected}
+              onChange={handleFileChange}
               className="hidden"
             />
 
@@ -200,20 +193,18 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className={`flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition-colors ${
-                attachments.length > 0
+                files.length > 0
                   ? "border-teal-300 bg-teal-50/50 text-teal-700 hover:border-teal-400 hover:bg-teal-50"
                   : "border-dashed border-gray-300 text-gray-600 hover:border-teal-400 hover:text-teal-600"
               }`}
             >
               <Paperclip className="h-4 w-4" />
-              {attachments.length > 0
-                ? t("Add more files")
-                : t("Add attachment")}
+              {files.length > 0 ? t("Add more files") : t("Add attachment")}
             </button>
 
-            {attachments.length > 0 && (
+            {files.length > 0 && (
               <ul className="mt-3 space-y-2">
-                {attachments.map((file, index) => (
+                {files.map((file, index) => (
                   <li
                     key={`${file.name}-${index}`}
                     className="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/50 px-3 py-2"
@@ -229,7 +220,7 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
                     </div>
                     <button
                       type="button"
-                      onClick={() => removeAttachment(index)}
+                      onClick={() => removeFile(index)}
                       aria-label={t("Remove attachment")}
                       className="shrink-0 text-gray-400 transition-colors hover:text-red-500"
                     >

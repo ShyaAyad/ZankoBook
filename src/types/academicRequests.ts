@@ -38,4 +38,4 @@ export interface AcademicRequest {
 }
 
 export type SendAcademicRequestResponse = ApiResponse<AcademicRequest>;
-
+export type GetAcademicRequestsResponse = ApiResponse<AcademicRequest[]>;
