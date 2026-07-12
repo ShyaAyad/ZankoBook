@@ -1,6 +1,6 @@
 import type { ApiResponse } from "@/types/api";
 
-export type UserRole = "STUDENT" | "LECTURER";
+export type UserRole = "student" | "lecturer";
 
 export interface ScopeUniversity {
   id: number;
