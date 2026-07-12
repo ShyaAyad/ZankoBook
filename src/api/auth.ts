@@ -35,7 +35,7 @@ export async function logout(): Promise<string> {
 }
 
 export async function getProfile(): Promise<User> {
-  const response = await api.get<GetProfileResponse>("/api/auth/profile");
+  const response = await api.get<GetProfileResponse>("/api/auth/me");
 
   const { success, message, data } = response.data;
 
