@@ -6,7 +6,7 @@ import RequestsPage from "./pages/AcademicRequestsPage";
 import ProtectedRoutes from "@/components/auth/ProtectedRoutes";
 import Profile from "@/pages/Profile";
 import CoursePage from "./pages/courses/CoursePage";
-import CourseSection from "./pages/courses/CourseSection";
+import CourseSection from "./pages/courses/CourseDetails";
 
 function App() {
   return (

@@ -5,13 +5,21 @@ import { useUserStore } from "@/store/userStore";
 import type { Course } from "@/types/course";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { Loader } from "lucide-react";
 
 const ContentSection = () => {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const { data: studentCourses = [] } = useStudentCourses();
+  const { data: studentCourses = [], isLoading } = useStudentCourses();
+
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="animate-spin" />
+      </div>
+    );
 
   return (
     <div className="mx-[20%]">

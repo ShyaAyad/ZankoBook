@@ -16,9 +16,6 @@ const CoursePage = () => {
   const lecturerCourses = useLecturerCourses();
   const { data: courses = [] } = isLecturer ? lecturerCourses : studentCourses;
 
-  console.log(isLecturer);
-  console.log(courses)
-
   return (
     <div className="mx-[20%]">
       <PageHeader
@@ -29,7 +26,6 @@ const CoursePage = () => {
         semester="semester 2"
         year="2025-2025"
       />
-
 
       <div className="grid grid-cols-3 gap-5 mt-5">
         {courses?.map((course) => (
