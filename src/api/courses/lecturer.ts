@@ -19,7 +19,9 @@ export async function getCourseById(id: string) {
 }
 
 export async function getCourseSubmissionSummary(id: string) {
-  const response = await api.get(`/api/moodle/lecturer/courses/${id}/submissions-summary`);
+  const response = await api.get(
+    `/api/moodle/lecturer/courses/${id}/submissions-summary`,
+  );
   const { success, message, data } = response.data;
 
   if (!success) throw new Error(message);
