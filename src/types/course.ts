@@ -34,3 +34,24 @@ export interface Course {
   created_at: string;
   updated_at: string;
 }
+
+export type CourseSectionPayload = {
+  title: string;
+};
+
+export type AddSectionItemPayload = {
+  title: string;
+  material_file_name: string;
+  file: File;
+};
+
+export interface SectionItemPayload {
+  material_file_name: string;
+  file: string;
+}
+
+export interface GradeAndFeedbackPayload {
+  grade: number;
+  feedback: string;
+  weight: number;
+}
