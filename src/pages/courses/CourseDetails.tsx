@@ -9,6 +9,7 @@ import AttendancePage from "@/pages/courses/courseDetails/attendanceSection/inde
 import type { CourseSection } from "@/types/course";
 // import { useQuery } from "@tanstack/react-query";
 // import { getCourseSections } from "@/api/courses/student";
+import GradesSection from "@/pages/courses/courseDetails/gradeSection/index";
 
 const mockCourse = {
   id: 1,
@@ -123,11 +124,9 @@ const CourseDetails = () => {
   const user = useUserStore((state) => state.user);
   const isLecturer = user?.roles?.[0]?.name === "lecturer";
 
-
   const studentCourse = useStudentCourse(courseId);
   const lecturerCourse = useLecturerCourse(courseId);
   const { data: course } = isLecturer ? lecturerCourse : studentCourse;
-
 
   // const { data: sections = [] } = useQuery({
   //   queryKey: ["course-sections", courseId],
@@ -150,7 +149,7 @@ const CourseDetails = () => {
 
       {activeTab === "content" && <ContentSection sections={sections} />}
       {activeTab === "attendance" && <AttendancePage />}
-      {activeTab === "grades" && <div>{/* grades component here */}</div>}
+      {activeTab === "grades" && <GradesSection />}
     </div>
   );
 };
