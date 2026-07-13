@@ -53,7 +53,7 @@ const MaterialModal = ({ sectionId, courseId, onClose }: SectionCardProps) => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["course-sections", courseId],
+        queryKey: ["course-sections"],
       });
       onClose();
     },

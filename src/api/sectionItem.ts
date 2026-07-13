@@ -64,6 +64,18 @@ export async function updateSectionItem(
   return data;
 }
 
+export async function deleteSectionItem(sectionItemId: string | Number) {
+  const response = await api.delete(
+    `api/moodle/section-items/${sectionItemId}`,
+  );
+
+  const { success, message, data } = response.data;
+
+  if (!success) throw new Error(message);
+
+  return data;
+}
+
 export async function gradeAndFeedback(
   submissionId: string | number,
   payload: GradeAndFeedbackPayload,
