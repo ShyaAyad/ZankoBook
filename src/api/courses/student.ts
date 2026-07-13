@@ -24,5 +24,5 @@ export async function getCourseSections(id: string) {
 
   if (!success) throw new Error(message);
 
-  return data.data;
+  return data;
 }

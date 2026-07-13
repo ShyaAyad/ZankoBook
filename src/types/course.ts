@@ -40,14 +40,13 @@ export type CourseSectionPayload = {
 };
 
 export type AddSectionItemPayload = {
-  title: string;
   material_file_name: string;
   file: File;
 };
 
 export interface SectionItemPayload {
   material_file_name: string;
-  file: string;
+  file: File[];
 }
 
 export interface GradeAndFeedbackPayload {
