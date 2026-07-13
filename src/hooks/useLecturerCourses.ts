@@ -2,10 +2,11 @@ import { courses } from "@/api/courses/lecturer";
 import type { Course } from "@/types/course";
 import { useQuery } from "@tanstack/react-query";
 
-const useLecturerCourses = () => {
+const useLecturerCourses = (enabled: boolean = true) => {
   return useQuery<Course[]>({
     queryKey: ["lecturer-courses"],
-    queryFn: courses
+    queryFn: courses,
+    enabled,
   });
 };
 

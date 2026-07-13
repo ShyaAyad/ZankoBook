@@ -6,7 +6,7 @@ import RequestsPage from "./pages/AcademicRequestsPage";
 import ProtectedRoutes from "@/components/auth/ProtectedRoutes";
 import Profile from "@/pages/Profile";
 import CoursePage from "./pages/courses/CoursePage";
-import CourseSection from "./pages/courses/CourseDetails";
+import CoureseDetails from "./pages/courses/CourseDetails";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/requests" element={<RequestsPage />} />
             <Route path="/" element={<CoursePage />} />
-            <Route path="/courses/:courseId" element={<CourseSection />} />
+            <Route path="/courses/:courseId" element={<CoureseDetails />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>

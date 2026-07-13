@@ -5,16 +5,20 @@ import useLecturerCourses from "@/hooks/useLecturerCourses";
 import { useUserStore } from "@/store/userStore";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import CourseCardSkeleton from "@/components/common/CourseCardSkeleton";
 
 const CoursePage = () => {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const isLecturer = user?.roles[0].name === "lecturer";
+  const isLecturer = user?.roles?.[0]?.name === "lecturer";
 
-  const studentCourses = useStudentCourses();
-  const lecturerCourses = useLecturerCourses();
-  const { data: courses = [] } = isLecturer ? lecturerCourses : studentCourses;
+  const studentCourses = useStudentCourses(!isLecturer);
+  const lecturerCourses = useLecturerCourses(isLecturer);
+  const { data: courses = [], isLoading } = isLecturer
+    ? lecturerCourses
+    : studentCourses;
+
 
   return (
     <div className="mx-[20%]">
@@ -28,16 +32,20 @@ const CoursePage = () => {
       />
 
       <div className="grid grid-cols-3 gap-5 mt-5">
-        {courses?.map((course) => (
-          <CourseCard
-            key={course.id}
-            code={course.code}
-            title={course.name}
-            students={course.students_count}
-            sections={course.sections_count}
-            onClick={() => navigate(`/courses/${course.id}`)}
-          />
-        ))}
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <CourseCardSkeleton key={i} />
+            ))
+          : courses.map((course) => (
+              <CourseCard
+                key={course.id}
+                code={course.code}
+                title={course.name}
+                students={course.students_count}
+                sections={course.sections_count}
+                onClick={() => navigate(`/courses/${course.id}`)}
+              />
+            ))}
       </div>
     </div>
   );

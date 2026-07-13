@@ -51,11 +51,13 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
-      setFiles((prev) => [...prev, ...Array.from(e.target.files!)]);
+      const newFiles = Array.from(e.target.files);
+      setFiles((prev) => [...prev, ...newFiles]);
+
       notifySuccess(
-        files.length === 1
+        newFiles.length === 1
           ? t("1 file added")
-          : t("{{count}} files added", { count: files.length }),
+          : t("{{count}} files added", { count: newFiles.length }),
       );
     }
   }
