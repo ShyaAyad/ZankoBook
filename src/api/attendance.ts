@@ -9,6 +9,9 @@ import type {
   SaveAttendancePayload,
   GetAttendanceRecordsResponse,
   RecordAttendanceResponse,
+  GetMyAttendanceResponse,
+  GetMyAttendanceParams,
+  StudentPersonalAttendanceRecord,
 } from "@/types/attendance";
 
 export async function createAttendanceWeek(
@@ -77,6 +80,23 @@ export async function submitAttendanceRecords(
   const response = await api.post<RecordAttendanceResponse>(
     `/api/moodle/attendance-sessions/${weekId}/attendance`,
     payload,
+  );
+
+  const { success, message, data } = response.data;
+
+  if (!success) throw new Error(message);
+
+  return data;
+}
+
+export async function getMyAttendance(
+  params?: GetMyAttendanceParams,
+): Promise<StudentPersonalAttendanceRecord[]> {
+  const response = await api.get<GetMyAttendanceResponse>(
+    "/api/moodle/my-attendance",
+    {
+      params,
+    },
   );
 
   const { success, message, data } = response.data;

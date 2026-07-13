@@ -51,6 +51,11 @@ export interface AttendanceRecord {
   updated_at: string;
 }
 
+// Students personal attendance record
+export interface StudentPersonalAttendanceRecord extends AttendanceRecord {
+  attendance_session: AttendanceWeek;
+}
+
 export interface SaveAttendancePayload {
   attendance: {
     student_id: number;
@@ -59,8 +64,18 @@ export interface SaveAttendancePayload {
   }[];
 }
 
+// Parameters for `getMyAttendance`
+export interface GetMyAttendanceParams {
+  course_id?: number;
+  status?: AttendanceStatus;
+  per_page?: number;
+}
+
 export type CreateAttendanceWeekResponse = ApiResponse<AttendanceWeek>;
 export type GetCourseStudentsResponse = ApiResponse<{ data: CourseStudent[] }>;
 export type GetAttendanceWeeksResponse = ApiResponse<AttendanceWeek[]>;
 export type GetAttendanceRecordsResponse = ApiResponse<AttendanceRecord[]>;
 export type RecordAttendanceResponse = ApiResponse<null>;
+export type GetMyAttendanceResponse = ApiResponse<
+  StudentPersonalAttendanceRecord[]
+>;
