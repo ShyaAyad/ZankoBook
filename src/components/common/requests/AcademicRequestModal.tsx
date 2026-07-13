@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeAcademicRequest } from "@/api/academicRequests";
 import { notifySuccess } from "@/lib/toast";
 import type { AcademicRequestPayload } from "@/types/academicRequests";
-import AttachmentPreview from "./AttachmentPreview";
+import AttachmentPreview from "../AttachmentPreview";
 
 export type AcademicRequestType =
   | "leave"

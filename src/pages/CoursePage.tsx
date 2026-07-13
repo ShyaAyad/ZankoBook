@@ -19,7 +19,6 @@ const CoursePage = () => {
     ? lecturerCourses
     : studentCourses;
 
-
   return (
     <div className="mx-[20%]">
       <PageHeader

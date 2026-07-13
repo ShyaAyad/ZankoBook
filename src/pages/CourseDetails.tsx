@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import CourseHeader, { type CourseTab } from "@/components/common/CourseHeader";
-import ContentSection from "@/pages/courses/ContentSection";
+import ContentSection from "@/pages/CourseDetails/ContentSection";
 import useStudentCourse from "@/hooks/useStudentCourse";
 import useLecturerCourse from "@/hooks/useLecturerCourse";
 import { useUserStore } from "@/store/userStore";
-import AttendancePage from "@/pages/courses/courseDetails/attendanceSection/index";
+import AttendancePage from "@/pages/CourseDetails/attendanceSection/index";
 import type { CourseSection } from "@/types/course";
 // import { useQuery } from "@tanstack/react-query";
 // import { getCourseSections } from "@/api/courses/student";
@@ -123,11 +123,9 @@ const CourseDetails = () => {
   const user = useUserStore((state) => state.user);
   const isLecturer = user?.roles?.[0]?.name === "lecturer";
 
-
   const studentCourse = useStudentCourse(courseId);
   const lecturerCourse = useLecturerCourse(courseId);
   const { data: course } = isLecturer ? lecturerCourse : studentCourse;
-
 
   // const { data: sections = [] } = useQuery({
   //   queryKey: ["course-sections", courseId],
