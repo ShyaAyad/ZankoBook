@@ -148,7 +148,7 @@ const CourseDetails = () => {
         onTabChange={setActiveTab}
       />
 
-      {activeTab === "content" && <ContentSection />}
+      {activeTab === "content" && <ContentSection sections={sections} />}
       {activeTab === "attendance" && <AttendancePage />}
       {activeTab === "grades" && <div>{/* grades component here */}</div>}
     </div>

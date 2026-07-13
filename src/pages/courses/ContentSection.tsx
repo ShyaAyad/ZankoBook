@@ -9,7 +9,7 @@ import { Loader } from "lucide-react";
 import SectionCard from "@/components/common/SectionCard";
 import type { CourseSection } from "@/types/course";
 
-const ContentSection = () => {
+const ContentSection = ({ sections }: { sections: CourseSection[] }) => {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -23,11 +23,15 @@ const ContentSection = () => {
       </div>
     );
 
-const ContentSection = ({ sections }: { sections: CourseSection[] }) => {
   return (
     <div className="flex flex-col gap-4">
       {sections.map((section, index) => (
-        <SectionCard key={section.id} section={section} index={index} defaultOpen={index === 0} />
+        <SectionCard
+          key={section.id}
+          section={section}
+          index={index}
+          defaultOpen={index === 0}
+        />
       ))}
     </div>
   );
