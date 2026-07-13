@@ -8,5 +8,13 @@
   "Courses": "Courses",
   "Courses you teach": "Courses you teach",
   "Courses you are enrolled in": "Courses you are enrolled in",
-  "semester": "semester"
+  "semester": "semester",
+  "Data Structures": "Data Structures",
+  "Content": "Content",
+  "Attendance": "Attendance",
+  "Grades": "Grades",
+  "Teachers": "Teachers",
+  "present": "present",
+  "All present": "All present",
+  "Student": "Student"
 }
