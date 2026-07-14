@@ -18,6 +18,8 @@ import {
 } from "@/api/attendance";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notifySuccess, notifyError } from "@/lib/toast";
+import WeekCardsSkeleton from "@/components/common/attendance/WeekCardSkeleton";
+import AttendanceTableSkeleton from "@/components/common/attendance/AttendanceTableSkeleton";
 
 const LecturerAttendanceSection = () => {
   const { t } = useTranslation();
@@ -155,26 +157,27 @@ const LecturerAttendanceSection = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center gap-3 mb-8">
           {/* Show loading spinner when fetching weeks */}
-          {isLoadingWeeks && (
-            <span className="text-sm text-slate-400">...</span>
+          {isLoadingWeeks ? (
+            <WeekCardsSkeleton />
+          ) : (
+            sortedWeeks.map((week) => {
+              const isActive = week.id === selectedWeekId;
+              return (
+                <button
+                  key={week.id}
+                  onClick={() => setSelectedWeekId(week.id)}
+                  title={week.session_date}
+                  className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors cursor-pointer ${
+                    isActive
+                      ? "bg-teal-600 text-white shadow-sm"
+                      : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {week.title}
+                </button>
+              );
+            })
           )}
-          {sortedWeeks.map((week) => {
-            const isActive = week.id === selectedWeekId;
-            return (
-              <button
-                key={week.id}
-                onClick={() => setSelectedWeekId(week.id)}
-                title={week.session_date}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-colors cursor-pointer ${
-                  isActive
-                    ? "bg-teal-600 text-white shadow-sm"
-                    : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                {week.title}
-              </button>
-            );
-          })}
 
           <button
             onClick={() => setIsAddWeekModalOpen(true)}
@@ -230,18 +233,19 @@ const LecturerAttendanceSection = () => {
 
           <div className="flex flex-col">
             {/* Show a loading spinner when fetching students */}
-            {isLoadingStudents && (
-              <span className="text-sm text-slate-400">...</span>
+            {isLoadingStudents ? (
+              <AttendanceTableSkeleton rows={5} />
+            ) : (
+              students.map((student) => (
+                <StudentAttendanceRow
+                  key={student.id}
+                  student={student}
+                  status={attendance[student.id]}
+                  onStatusChange={handleStatusChange}
+                  disabled={!selectedWeekId}
+                />
+              ))
             )}
-            {students.map((student) => (
-              <StudentAttendanceRow
-                key={student.id}
-                student={student}
-                status={attendance[student.id]}
-                onStatusChange={handleStatusChange}
-                disabled={!selectedWeekId}
-              />
-            ))}
           </div>
         </div>
       </div>

@@ -5,8 +5,8 @@ import LoginPage from "@/pages/LoginPage";
 import RequestsPage from "./pages/AcademicRequestsPage";
 import ProtectedRoutes from "@/components/auth/ProtectedRoutes";
 import Profile from "@/pages/Profile";
-import CoursePage from "./pages/courses/CoursePage";
-import CoureseDetails from "./pages/courses/CourseDetails";
+import CoursePage from "./pages/CoursePage";
+import CoureseDetails from "./pages/CourseDetails";
 
 function App() {
   return (
