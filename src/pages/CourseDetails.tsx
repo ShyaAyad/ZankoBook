@@ -5,10 +5,10 @@ import ContentSection from "@/pages/CourseDetails/ContentSection";
 import useStudentCourse from "@/hooks/useStudentCourse";
 import useLecturerCourse from "@/hooks/useLecturerCourse";
 import { useUserStore } from "@/store/userStore";
-import AttendancePage from "@/pages/courses/courseDetails/gradeSection/components/LecturerGradesSection"
+import AttendancePage from "@/pages/CourseDetails/attendanceSection/index"
 import { useQuery } from "@tanstack/react-query";
 import { getCourseSections } from "@/api/courses/student";
-import GradesSection from "./courses/courseDetails/gradeSection";
+import GradesSection from "@/pages/CourseDetails/gradeSection/index"
 
 const CourseDetails = () => {
   const { courseId } = useParams();

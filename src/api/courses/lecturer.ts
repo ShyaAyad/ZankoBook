@@ -6,7 +6,7 @@ export async function courses() {
 
   if (!success) throw new Error(message);
 
-  return data.courses;
+  return data;
 }
 
 export async function getCourseById(id: string) {
