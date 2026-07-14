@@ -5,10 +5,8 @@ import ContentSection from "@/pages/CourseDetails/ContentSection";
 import useStudentCourse from "@/hooks/useStudentCourse";
 import useLecturerCourse from "@/hooks/useLecturerCourse";
 import { useUserStore } from "@/store/userStore";
-import AttendancePage from "@/pages/CourseDetails/attendanceSection/index"
-import { useQuery } from "@tanstack/react-query";
-import { getCourseSections } from "@/api/courses/student";
-import GradesSection from "@/pages/CourseDetails/gradeSection/index"
+import AttendancePage from "@/pages/CourseDetails/attendanceSection/index";
+import GradesSection from "@/pages/CourseDetails/gradeSection/index";
 
 const CourseDetails = () => {
   const { courseId } = useParams();
@@ -19,12 +17,6 @@ const CourseDetails = () => {
   const studentCourse = useStudentCourse(courseId);
   const lecturerCourse = useLecturerCourse(courseId);
   const { data: course } = isLecturer ? lecturerCourse : studentCourse;
-
-  const { data: sections = [] } = useQuery({
-    queryKey: ["course-sections", courseId],
-    queryFn: () => getCourseSections(courseId!),
-    enabled: !!courseId,
-  });
 
   if (!course) return null;
 
@@ -37,7 +29,7 @@ const CourseDetails = () => {
         onTabChange={setActiveTab}
       />
 
-      {activeTab === "content" && <ContentSection sections={sections} />}
+      {activeTab === "content" && <ContentSection />}
       {activeTab === "attendance" && <AttendancePage />}
       {activeTab === "grades" && <GradesSection />}
     </div>

@@ -5,12 +5,21 @@ import { useUserStore } from "@/store/userStore";
 import type { CourseSection } from "@/types/course";
 import { useParams } from "react-router-dom";
 import AddSectionModal from "@/components/common/AddSectionModal";
+import { getCourseSections } from "@/api/courses/student";
+import { useQuery } from "@tanstack/react-query";
+import SectionCardSkeleton from "@/components/common/SectionCardSkeleton";
 
-const ContentSection = ({ sections }: { sections: CourseSection[] }) => {
+const ContentSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const user = useUserStore((state) => state.user);
   const { courseId } = useParams();
   const isLecturer = user?.roles[0].name === "lecturer";
+
+  const { data: sections = [], isLoading } = useQuery<CourseSection[]>({
+    queryKey: ["course-sections", courseId],
+    queryFn: () => getCourseSections(courseId!),
+    enabled: !!courseId,
+  });
 
   return (
     <div className="flex flex-col gap-4">
@@ -23,14 +32,18 @@ const ContentSection = ({ sections }: { sections: CourseSection[] }) => {
         </Button>
       )}
 
-      {sections.map((section, index) => (
-        <SectionCard
-          key={section.id}
-          section={section}
-          index={index}
-          defaultOpen={index === 0}
-        />
-      ))}
+      {isLoading
+        ? Array.from({ length: 3 }).map((_, i) => (
+            <SectionCardSkeleton key={i} />
+          ))
+        : sections.map((section, index) => (
+            <SectionCard
+              key={section.id}
+              section={section}
+              index={index}
+              defaultOpen={index === 0}
+            />
+          ))}
 
       {isModalOpen && courseId && (
         <AddSectionModal
