@@ -9,6 +9,7 @@ import AttendancePage from "@/pages/CourseDetails/attendanceSection/index";
 import type { CourseSection } from "@/types/course";
 // import { useQuery } from "@tanstack/react-query";
 // import { getCourseSections } from "@/api/courses/student";
+import GradesSection from "@/pages/courses/courseDetails/gradeSection/index";
 
 const mockCourse = {
   id: 1,
@@ -148,7 +149,7 @@ const CourseDetails = () => {
 
       {activeTab === "content" && <ContentSection sections={sections} />}
       {activeTab === "attendance" && <AttendancePage />}
-      {activeTab === "grades" && <div>{/* grades component here */}</div>}
+      {activeTab === "grades" && <GradesSection />}
     </div>
   );
 };
