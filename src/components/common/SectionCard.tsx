@@ -8,10 +8,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type {
-  CourseSection,
-  SectionItem,
-} from "@/types/course";
+import type { CourseSection, SectionItem } from "@/types/course";
 import { useUserStore } from "@/store/userStore";
 import { deleteSection } from "@/api/courseSection";
 import SubmissionModal from "./SubmissionModal";
@@ -145,18 +142,22 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    onClick={() => setEditingItem(item)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
-                  >
-                    <Pen size={14} />
-                  </Button>
-                  <Button
-                    onClick={() => removeSectionItem(item.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 transition-colors disabled:opacity-60"
-                  >
-                    <Trash size={14} />
-                  </Button>
+                  {isLecturer && (
+                    <>
+                      <Button
+                        onClick={() => setEditingItem(item)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                      >
+                        <Pen size={14} />
+                      </Button>
+                      <Button
+                        onClick={() => removeSectionItem(item.id)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 transition-colors disabled:opacity-60"
+                      >
+                        <Trash size={14} />
+                      </Button>
+                    </>
+                  )}
                   <a
                     href={item.material_file_url || item.url}
                     target="_blank"

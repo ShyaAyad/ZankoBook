@@ -48,7 +48,9 @@ export async function getAttendanceWeeks(courseId: number) {
     "/api/moodle/attendance-sessions",
     {
       params: {
-        course_id: courseId,
+        filter: {
+          course_id: courseId,
+        },
       },
     },
   );

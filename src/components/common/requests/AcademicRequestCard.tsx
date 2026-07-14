@@ -1,7 +1,6 @@
 import { Calendar, Paperclip } from "lucide-react";
-import { HiArrowLongRight } from "react-icons/hi2";
+// import { HiArrowLongRight } from "react-icons/hi2";
 import { useTranslation } from "react-i18next";
-// import { useMutation } from "@tanstack/react-query";
 import type { RequestStatus } from "@/types/academicRequests";
 
 interface RequestCardProps {
@@ -38,12 +37,12 @@ const RequestCard = ({
   description,
   dateIssued,
   attachmentCount,
-  onViewLetter,
+  // onViewLetter,
 }: RequestCardProps) => {
   const { i18n } = useTranslation();
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4 h-full">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
           {type}
@@ -55,7 +54,7 @@ const RequestCard = ({
         </span>
       </div>
 
-      <div>
+      <div className="flex-1">
         <h3 className="text-lg font-bold text-gray-900">{subject}</h3>
         <p className="text-sm text-gray-500 mt-1">{description}</p>
       </div>
@@ -71,7 +70,7 @@ const RequestCard = ({
             {attachmentCount}
           </span>
         </div>
-        <button
+        {/* <button
           onClick={onViewLetter}
           className="flex items-center gap-1 text-teal-600 font-semibold hover:text-teal-700"
         >
@@ -79,7 +78,7 @@ const RequestCard = ({
             <HiArrowLongRight />
           </span>{" "}
           letter
-        </button>
+        </button> */}
       </div>
     </div>
   );

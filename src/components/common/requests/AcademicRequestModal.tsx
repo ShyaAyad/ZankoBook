@@ -7,6 +7,7 @@ import { makeAcademicRequest } from "@/api/academicRequests";
 import { notifySuccess } from "@/lib/toast";
 import type { AcademicRequestPayload } from "@/types/academicRequests";
 import AttachmentPreview from "../AttachmentPreview";
+import { useUserStore } from "@/store/userStore";
 
 export type AcademicRequestType =
   | "leave"
@@ -31,6 +32,9 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useUserStore();
+  const isLecturer = user?.roles[0]?.name === "lecturer";
+  const isScopeIdNull = user?.scopes[0].scope_id === null;
 
   const [type, setType] = useState<AcademicRequestType>("leave");
   const [subject, setSubject] = useState("");
@@ -75,6 +79,8 @@ const AcademicRequestModal = ({ onClose }: AcademicRequestModalProps) => {
       subject: subject.trim(),
       description: description.trim(),
       files,
+      department_id:
+        isLecturer && !isScopeIdNull ? user.scopes[0].scope_id! : undefined,
     });
   }
 
