@@ -35,6 +35,26 @@ export interface Course {
   updated_at: string;
 }
 
+export type CourseSectionPayload = {
+  title: string;
+};
+
+export type AddSectionItemPayload = {
+  material_file_name: string;
+  file: File;
+};
+
+export interface SectionItemPayload {
+  material_file_name: string;
+  file: File[];
+}
+
+export interface GradeAndFeedbackPayload {
+  grade: number;
+  feedback: string;
+  weight: number;
+}
+
 export interface SectionItem {
   id: number;
   section_id: number;
