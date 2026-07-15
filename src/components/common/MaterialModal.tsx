@@ -33,7 +33,7 @@ const FileTypeIcon = ({ extension }: { extension: string }) => {
   return <FileIcon size={22} />;
 };
 
-const MaterialModal = ({ sectionId, courseId, onClose }: SectionCardProps) => {
+const MaterialModal = ({ sectionId, onClose }: SectionCardProps) => {
   const [materialFileName, setMaterialFileName] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
