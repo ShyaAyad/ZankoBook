@@ -1,18 +1,20 @@
 import api from "@/lib/axios";
 import type {
   AddSectionItemPayload,
-  GradeAndFeedbackPayload,
+  SectionItem,
   SectionItemPayload,
 } from "@/types/course";
 
-// returns : Promise<SectionItem>
 export async function addSectionItem(
   sectionId: string | number,
   payload: AddSectionItemPayload,
-) {
+): Promise<SectionItem> {
   const formData = new FormData();
-  formData.append("material_file_name", payload.material_file_name);
-  formData.append("file", payload.file);
+
+  if (payload.title) formData.append("title", payload.title);
+  if (payload.description) formData.append("description", payload.description);
+  if (payload.url) formData.append("url", payload.url);
+  if (payload.file) formData.append("file", payload.file);
 
   const response = await api.post(
     `api/moodle/course-sections/${sectionId}/items`,
@@ -26,7 +28,9 @@ export async function addSectionItem(
   return data;
 }
 
-export async function getAllSectionItems(sectionId: string | number) {
+export async function getAllSectionItems(
+  sectionId: string | number,
+): Promise<SectionItem> {
   const response = await api.get(
     `api/moodle/course-sections/${sectionId}/items`,
   );
@@ -51,7 +55,7 @@ export async function getSingleSectionItem(sectionItemId: string | number) {
 export async function updateSectionItem(
   sectionItemId: string | number,
   payload: SectionItemPayload,
-) {
+): Promise<SectionItem> {
   const response = await api.put(
     `api/moodle/section-items/${sectionItemId}`,
     payload,
@@ -64,25 +68,9 @@ export async function updateSectionItem(
   return data;
 }
 
-export async function deleteSectionItem(sectionItemId: string | Number) {
+export async function deleteSectionItem(sectionItemId: string | number) {
   const response = await api.delete(
     `api/moodle/section-items/${sectionItemId}`,
-  );
-
-  const { success, message, data } = response.data;
-
-  if (!success) throw new Error(message);
-
-  return data;
-}
-
-export async function gradeAndFeedback(
-  submissionId: string | number,
-  payload: GradeAndFeedbackPayload,
-) {
-  const response = await api.put(
-    `api/moodle/student-submissions/${submissionId}/grade`,
-    payload,
   );
 
   const { success, message, data } = response.data;
