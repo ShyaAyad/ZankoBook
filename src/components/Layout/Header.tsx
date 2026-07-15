@@ -11,6 +11,7 @@ import { useUserStore } from "@/store/userStore";
 const navItems = [
   { label: "Courses", to: "/" },
   { label: "Requests", to: "/requests" },
+  { label: "Calendar", to: "/calendar" },
   { label: "Profile", to: "/profile" },
 ];
 

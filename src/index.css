@@ -136,3 +136,50 @@ input[type="password"]::-ms-clear {
     @apply font-sans;
   }
 }
+
+.fc {
+  --fc-border-color: #e2e8f0;
+  --fc-today-bg-color: #fff7ed;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #e2e8f0;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.fc .fc-button {
+  background: white;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.fc .fc-button:hover {
+  background: #f8fafc;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background: #0d9488;
+  border-color: #0d9488;
+}
+
+.fc .fc-daygrid-day-number {
+  color: #334155;
+  font-weight: 600;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  color: #ea580c;
+}
+
+.fc .fc-scrollgrid {
+  border-radius: 20px;
+  overflow: hidden;
+}

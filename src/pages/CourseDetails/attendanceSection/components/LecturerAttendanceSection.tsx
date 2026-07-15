@@ -26,14 +26,16 @@ const LecturerAttendanceSection = () => {
   const { courseId } = useParams();
   const queryClient = useQueryClient();
   const { data: course } = useLecturerCourse(courseId?.toString());
+
   const [selectedWeekId, setSelectedWeekId] = useState<number | null>(null);
   const [isAddWeekModalOpen, setIsAddWeekModalOpen] = useState(false);
   const [attendance, setAttendance] = useState<
     Record<number, AttendanceStatus>
   >({});
+
   const hydratedWeekIdRef = useRef<number | null>(null);
 
-  // Fetching attendance weeks
+  // Fetch attendance weeks
   const {
     data: weeks = [],
     refetch: refetchWeeks,
@@ -43,26 +45,25 @@ const LecturerAttendanceSection = () => {
     queryFn: () => getAttendanceWeeks(Number(courseId)),
   });
 
-  // Fetching students in that course
+  // Fetch students
   const { data: students = [], isLoading: isLoadingStudents } = useQuery({
-    queryFn: () => getCourseStudents(Number(courseId)),
     queryKey: ["course-students", courseId],
+    queryFn: () => getCourseStudents(Number(courseId)),
   });
 
-  // Sort weeks by date created
   const sortedWeeks = [...weeks].sort((a, b) =>
     a.session_date.localeCompare(b.session_date),
   );
 
-  // Fetching attendance records of a week when it is selected
+  // Fetch attendance records
   const { data: attendanceRecords = [], isLoading: isLoadingRecords } =
     useQuery({
-      queryFn: () => getAttendanceRecords(selectedWeekId!),
       queryKey: ["attendance-records", selectedWeekId],
+      queryFn: () => getAttendanceRecords(selectedWeekId!),
       enabled: !!selectedWeekId,
     });
 
-  // Saving attendance status
+  // Save attendance
   const { mutate: saveAttendance, isPending: isSavingAttendance } = useMutation(
     {
       mutationFn: (payload: SaveAttendancePayload) =>
@@ -79,7 +80,7 @@ const LecturerAttendanceSection = () => {
     },
   );
 
-  // Week changed | clear the sheet immediately and mark it as "not yet hydrated"
+  // Clear local state whenever week changes
   useEffect(() => {
     const clearSheet = () => {
       setAttendance({});
@@ -89,25 +90,22 @@ const LecturerAttendanceSection = () => {
     clearSheet();
   }, [selectedWeekId]);
 
-  // Records finished loading for the current week — hydrate once, then leave local edits alone
+  // Hydrate local state from server
   useEffect(() => {
-    const initAttendanceRecord = () => {
-      if (!selectedWeekId || isLoadingRecords) return;
-      if (hydratedWeekIdRef.current === selectedWeekId) return; // Already hydrated
+    if (!selectedWeekId || isLoadingRecords) return;
+    if (hydratedWeekIdRef.current === selectedWeekId) return;
 
-      hydratedWeekIdRef.current = selectedWeekId;
-      setAttendance(
-        attendanceRecords.reduce(
-          (acc, record) => {
-            acc[record.student.id] = record.status;
-            return acc;
-          },
-          {} as Record<number, AttendanceStatus>,
-        ),
-      );
-    };
+    hydratedWeekIdRef.current = selectedWeekId;
 
-    initAttendanceRecord();
+    setAttendance(
+      attendanceRecords.reduce(
+        (acc, record) => {
+          acc[record.student.id] = record.status;
+          return acc;
+        },
+        {} as Record<number, AttendanceStatus>,
+      ),
+    );
   }, [attendanceRecords, isLoadingRecords, selectedWeekId]);
 
   function handleWeekCreated(week: AttendanceWeek) {
@@ -116,32 +114,36 @@ const LecturerAttendanceSection = () => {
   }
 
   function handleStatusChange(studentId: number, status: AttendanceStatus) {
-    setAttendance((prev) => ({ ...prev, [studentId]: status }));
+    setAttendance((prev) => ({
+      ...prev,
+      [studentId]: status,
+    }));
   }
 
   function handleAllPresent() {
     setAttendance(
-      Object.fromEntries(students.map((s) => [s.id, "Present" as const])),
+      Object.fromEntries(
+        students.map((student) => [student.id, "Present" as const]),
+      ),
     );
   }
 
   function handleSave() {
     if (!selectedWeekId) return;
 
-    // if we have any missing students inside attendance, show error
     const hasMissingRecords = students.some(
       (student) => !attendance[student.id],
     );
 
     if (hasMissingRecords) {
       notifyError(t("Please fill in all attendance statuses"));
-      return; // Important: Return early so the save function doesn't run!
+      return;
     }
 
     saveAttendance({
-      attendance: students.map((s) => ({
-        student_id: s.id,
-        status: attendance[s.id],
+      attendance: students.map((student) => ({
+        student_id: student.id,
+        status: attendance[student.id],
       })),
     });
   }
@@ -156,12 +158,12 @@ const LecturerAttendanceSection = () => {
     <div className="min-h-screen p-8 font-sans">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center gap-3 mb-8">
-          {/* Show loading spinner when fetching weeks */}
           {isLoadingWeeks ? (
             <WeekCardsSkeleton />
           ) : (
             sortedWeeks.map((week) => {
               const isActive = week.id === selectedWeekId;
+
               return (
                 <button
                   key={week.id}
@@ -222,29 +224,31 @@ const LecturerAttendanceSection = () => {
         )}
 
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-          <div className="flex justify-between px-6 py-4 border-b border-slate-100">
-            <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">
-              {t("Student")}
-            </span>
-            <span className="text-xs font-bold text-slate-400 tracking-wider uppercase mr-1">
-              {t("Attendance")}
-            </span>
-          </div>
-
           <div className="flex flex-col">
-            {/* Show a loading spinner when fetching students */}
             {isLoadingStudents ? (
               <AttendanceTableSkeleton rows={5} />
             ) : (
-              students.map((student) => (
-                <StudentAttendanceRow
-                  key={student.id}
-                  student={student}
-                  status={attendance[student.id]}
-                  onStatusChange={handleStatusChange}
-                  disabled={!selectedWeekId}
-                />
-              ))
+              <>
+                <div className="flex justify-between px-6 py-4 border-b border-slate-100">
+                  <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">
+                    {t("Student")}
+                  </span>
+
+                  <span className="text-xs font-bold text-slate-400 tracking-wider uppercase mr-1">
+                    {t("Attendance")}
+                  </span>
+                </div>
+
+                {students.map((student) => (
+                  <StudentAttendanceRow
+                    key={student.id}
+                    student={student}
+                    status={attendance[student.id]}
+                    onStatusChange={handleStatusChange}
+                    disabled={!selectedWeekId}
+                  />
+                ))}
+              </>
             )}
           </div>
         </div>

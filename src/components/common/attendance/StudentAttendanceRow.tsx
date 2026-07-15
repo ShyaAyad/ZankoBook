@@ -38,20 +38,25 @@ const StudentAttendanceRow = ({
         {STATUS_OPTIONS.map((opt) => {
           const isActive = status === opt.key;
           return (
-            <button
+            <div
               key={opt.key}
-              type="button"
-              disabled={disabled}
-              onClick={() => onStatusChange(student.id, opt.key)}
-              className={cn(
-                "w-9 h-9 rounded-lg border text-sm font-bold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
-                isActive
-                  ? STATUS_STYLES[opt.key]
-                  : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50",
-              )}
+              title={disabled ? "Please select a week first." : undefined}
+              className="inline-block"
             >
-              {opt.label}
-            </button>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => onStatusChange(student.id, opt.key)}
+                className={cn(
+                  "w-9 h-9 rounded-lg border text-sm font-bold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+                  isActive
+                    ? STATUS_STYLES[opt.key]
+                    : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50",
+                )}
+              >
+                {opt.label}
+              </button>
+            </div>
           );
         })}
       </div>
