@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import useStudentCourse from "@/hooks/useStudentCourse";
 import { useQuery } from "@tanstack/react-query";
 import StudentAttendanceRecordSkeleton from "@/components/common/attendance/StudentAttendanceRecordSkeleton";
+import { useUserStore } from "@/store/userStore";
 
 const STATUS_ICON: Record<AttendanceStatus, typeof CheckCircle2> = {
   Present: CheckCircle2,
@@ -49,8 +50,10 @@ const StudentAttendance = () => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<FilterKey>("all");
   const { courseId } = useParams();
+  const { user } = useUserStore();
+  const isLecturer = user?.roles[0].name === "lecturer";
 
-  const { data: course } = useStudentCourse(courseId);
+  const { data: course } = useStudentCourse(courseId, !isLecturer);
 
   const { data: sessions = [], isLoading } = useQuery<
     StudentPersonalAttendanceRecord[]

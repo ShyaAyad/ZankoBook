@@ -6,6 +6,7 @@ import StudentGradeCard from "@/components/common/grades/StudentGradeCard";
 import useStudentCourse from "@/hooks/useStudentCourse";
 import { getMyGrades } from "@/api/grades";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUserStore } from "@/store/userStore";
 
 const toNumber = (value: unknown): number => {
   const n = Number(value);
@@ -15,8 +16,10 @@ const toNumber = (value: unknown): number => {
 const StudentGradesSection = () => {
   const { t } = useTranslation();
   const { courseId } = useParams();
+  const { user } = useUserStore();
+  const isLecturer = user?.roles[0].name === "lecturer";
 
-  const { data: course } = useStudentCourse(courseId);
+  const { data: course } = useStudentCourse(courseId, !isLecturer);
 
   const { data, isLoading } = useQuery({
     queryKey: ["my-grades", course?.id],
