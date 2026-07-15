@@ -6,9 +6,11 @@ import { getAcademicRequests } from "@/api/academicRequests";
 import { useQuery } from "@tanstack/react-query";
 import EmptyState from "@/components/common/EmptyState";
 import AcademicRequestCardSkeleton from "@/components/common/requests/AcademicRequestCardSkeleton";
+import { useTranslation } from "react-i18next";
 
 const AcademicRequestsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { t } = useTranslation();
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ["academic-requests"],
@@ -21,9 +23,9 @@ const AcademicRequestsPage = () => {
     <div className="p-8 mx-[20%]">
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Requests</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t("Requests")}</h1>
           <p className="text-gray-500 mt-1">
-            Requests are forwarded to your department in e-Zanko
+            {t("Requests are forwarded to your department in e-Zanko")}
           </p>
         </div>
         <button
@@ -31,7 +33,7 @@ const AcademicRequestsPage = () => {
           className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold px-5 py-3 rounded-xl transition-colors cursor-pointer"
         >
           <Plus className="w-5 h-5" />
-          New request
+          {t("New request")}
         </button>
       </div>
 
