@@ -1,5 +1,5 @@
 import { updateSectionItem } from "@/api/sectionItem";
-import type { SectionItem, SectionItemPayload } from "@/types/course";
+import type { SectionItem } from "@/types/course";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Upload, X } from "lucide-react";
 import { useState } from "react";
@@ -10,13 +10,13 @@ interface EditMaterialModalProps {
 }
 
 const EditMaterialModal = ({ item, onClose }: EditMaterialModalProps) => {
-  const isLink = !!item.url && !item.material_file_url;
-  const isNote = !item.url && !item.material_file_url;
+  const isLink = item.type === "link";
+  const isNote = item.type === "note";
   const isMaterial = !isLink && !isNote;
 
   const [title, setTitle] = useState(item.title ?? "");
-  const [description, setDescription] = useState(item.content ?? "");
-  const [url, setUrl] = useState(item.url ?? "");
+  const [description, setDescription] = useState(item.description ?? "");
+  const [url, setUrl] = useState(isLink ? (item.material_file_url ?? "") : "");
   const [file, setFile] = useState<File | null>(null);
   const queryClient = useQueryClient();
 
@@ -26,8 +26,7 @@ const EditMaterialModal = ({ item, onClose }: EditMaterialModalProps) => {
     error,
   } = useMutation({
     mutationKey: ["editSectionItem", item.id],
-    mutationFn: (payload: SectionItemPayload) =>
-      updateSectionItem(item.id, payload),
+    mutationFn: (payload: any) => updateSectionItem(item.id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["course-sections"] });
       onClose();
@@ -41,15 +40,28 @@ const EditMaterialModal = ({ item, onClose }: EditMaterialModalProps) => {
   const handleSubmit = () => {
     if (!title) return;
 
-    const payload: SectionItemPayload = { title };
-    if (isLink) payload.url = url;
-    if (isNote) payload.description = description;
-    if (isMaterial) {
-      payload.description = description;
-      if (file) payload.file = file;
+    const formData = new FormData();
+    formData.append("title", title);
+
+    if (isLink) {
+      formData.append("url", url);
     }
 
-    editItem(payload);
+    if (isNote) {
+      formData.append("description", description);
+    }
+
+    if (isMaterial) {
+      formData.append("description", description);
+      // Only append if the user actually picked a new file.
+      // Appending null/undefined here is what typically trips
+      // "must be type of file" validators server-side.
+      if (file) {
+        formData.append("file", file);
+      }
+    }
+
+    editItem(formData);
   };
 
   return (

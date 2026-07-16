@@ -66,7 +66,7 @@ export interface SectionItem {
   title: string;
   type: string;
   url: string;
-  content: string | null;
+  description: string | null;
   size: string;
   material_file_type: string;
   material_file_url: string;
