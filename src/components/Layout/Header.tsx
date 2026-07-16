@@ -3,10 +3,11 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Loader2, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "@/api/auth";
 import { useUserStore } from "@/store/userStore";
+import { useTranslation } from "react-i18next";
 
 const navItems = [
   { label: "Courses", to: "/" },
@@ -23,8 +24,11 @@ const languages: { code: Language; label: string }[] = [
   { code: "ar", label: "AR" },
 ];
 
+const RTL_LANGUAGES: Language[] = ["ar", "ku"];
+
 const Header = () => {
-  const [activeLanguage, setActiveLanguage] = useState<Language>("en");
+  const { i18n, t } = useTranslation();
+  const activeLanguage = i18n.language as Language;
   const { user, clearAuth } = useUserStore();
   const navigate = useNavigate();
 
@@ -43,6 +47,19 @@ const Header = () => {
   function handleLogout() {
     mutate();
   }
+
+  function handleLanguageChange(code: Language) {
+    i18n.changeLanguage(code);
+  }
+
+  // keep <html> dir/lang in sync with the active language
+  useEffect(() => {
+    document.documentElement.lang = activeLanguage;
+    document.documentElement.dir = RTL_LANGUAGES.includes(activeLanguage)
+      ? "rtl"
+      : "ltr";
+  }, [activeLanguage]);
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-20.5 items-center border-b border-border bg-card max-md:static max-md:grid max-md:h-auto max-md:min-h-20.5">
       <div className="flex h-full w-67.5 shrink-0 items-center gap-3 border-e border-border bg-card px-4.5 max-lg:w-60 max-md:h-20.5 max-md:w-full max-md:border-e-0 max-md:border-b">
@@ -78,7 +95,7 @@ const Header = () => {
                 )
               }
             >
-              {item.label}
+              {t(item.label)}
             </NavLink>
           ))}
         </div>
@@ -88,7 +105,7 @@ const Header = () => {
             {languages.map((l) => (
               <Button
                 key={l.code}
-                onClick={() => setActiveLanguage(l.code)}
+                onClick={() => handleLanguageChange(l.code)}
                 className={cn(
                   activeLanguage === l.code
                     ? "bg-teal-500 hover:bg-teal-500"
@@ -103,7 +120,9 @@ const Header = () => {
           <div className="flex items-center justify-center">
             <div className="mx-2">
               <p className="text-md font-bold">{user?.name}</p>
-              <p className="text-sm text-gray-500">{user?.roles[0].name}</p>
+              <p className="text-sm text-gray-500">
+                {t(user?.roles[0]?.name ?? "")}
+              </p>
             </div>
             {isPending ? (
               <Loader2 />

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface PageHeaderProps {
   title: string;
   description: string;
@@ -5,11 +7,19 @@ interface PageHeaderProps {
   year: string;
 }
 
-const PageHeader = ({ title, description, semester, year }: PageHeaderProps) => {
+const PageHeader = ({
+  title,
+  description,
+  semester,
+  year,
+}: PageHeaderProps) => {
+  const { t } = useTranslation();
   return (
     <div>
-      <p className="font-bold text-2xl my-2">{title}</p>
-      <p className="text-gray-500 text-sm">{description} &middot; {semester} &middot; {year}</p>
+      <p className="font-bold text-2xl my-2">{t(title)}</p>
+      <p className="text-gray-500 text-sm">
+        {t(description)} &middot; {t(semester)} &middot; {t(year)}
+      </p>
     </div>
   );
 };
