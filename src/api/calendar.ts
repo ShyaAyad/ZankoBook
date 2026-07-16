@@ -27,7 +27,6 @@ export async function getCalendarEvents(
     extendedProps: {
       assignmentId: event.assessment_id,
       description: event.description,
-      type: event.type,
       course: event.course,
       isSubmitted: event.is_submitted,
       isOverdue: event.is_overdue,

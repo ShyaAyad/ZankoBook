@@ -30,7 +30,7 @@ const ConfirmDialog = ({
   return (
     <div
       onClick={() => onOpenChange(false)}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
     >
       <div
         onClick={(e) => e.stopPropagation()}
