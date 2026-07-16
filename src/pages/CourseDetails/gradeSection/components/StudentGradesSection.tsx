@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-
 import StudentGradeCard from "@/components/common/grades/StudentGradeCard";
 import useStudentCourse from "@/hooks/useStudentCourse";
 import { getMyGrades } from "@/api/grades";

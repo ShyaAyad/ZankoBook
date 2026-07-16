@@ -1,5 +1,5 @@
-import StudentGradesSection from "@/pages/CourseDetails/gradeSection/components/StudentGrades";
-import LecturerGradesSection from "@/pages/CourseDetails/gradeSection/components/LecturerGrades";
+import StudentGradesSection from "@/pages/CourseDetails/gradeSection/components/StudentGradesSection";
+import LecturerGradesSection from "@/pages/CourseDetails/gradeSection/components/LecturerGradesSection";
 import { useUserStore } from "@/store/userStore";
 
 const GradesSection = () => {
