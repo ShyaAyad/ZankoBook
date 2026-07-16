@@ -54,7 +54,7 @@ const LoginPage = () => {
             <GraduationCap className="h-7 w-7 text-white" strokeWidth={2} />
           </div>
           <div>
-            <p className="text-xl font-bold leading-tight">{t("Moodle")}</p>
+            <p className="text-xl font-bold leading-tight">{t("ZankoBook")}</p>
             <p className="text-sm text-teal-100">{t("Department Learning")}</p>
           </div>
         </div>
@@ -94,7 +94,7 @@ const LoginPage = () => {
                 strokeWidth={2}
               />
             </div>
-            <p className="text-lg font-bold text-slate-900">{t("Moodle")}</p>
+            <p className="text-lg font-bold text-slate-900">{t("ZankoBook")}</p>
           </div>
 
           <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">

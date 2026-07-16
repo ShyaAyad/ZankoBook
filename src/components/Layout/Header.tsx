@@ -1,5 +1,5 @@
 import logo from "@/assets/ZankoBookLogo.png";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Loader2, LogOut } from "lucide-react";
@@ -10,7 +10,7 @@ import { useUserStore } from "@/store/userStore";
 import { useTranslation } from "react-i18next";
 
 const navItems = [
-  { label: "Courses", to: "/" },
+  { label: "Courses", to: "/", matchPrefixes: ["/courses"] },
   { label: "Requests", to: "/requests" },
   { label: "Calendar", to: "/calendar" },
   { label: "Profile", to: "/profile" },
@@ -31,6 +31,7 @@ const Header = () => {
   const activeLanguage = i18n.language as Language;
   const { user, clearAuth } = useUserStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { mutate, isPending } = useMutation({
     mutationFn: logout,
@@ -81,23 +82,29 @@ const Header = () => {
 
       <div className="flex h-full min-w-0 flex-1 items-center justify-between gap-5 bg-card px-6.5 max-md:h-auto max-md:flex-wrap max-md:p-4">
         <div className="flex gap-10">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                cn(
-                  buttonVariants({ variant: "ghost" }),
-                  isActive
-                    ? "bg-teal-200 text-teal-700 font-bold hover:bg-teal-200 hover:text-teal-500"
-                    : "text-muted-foreground hover:bg-white hover:text-foreground",
-                )
-              }
-            >
-              {t(item.label)}
-            </NavLink>
-          ))}
+          {navItems.map((item) => {
+            const isPrefixActive = item.matchPrefixes?.some((prefix) =>
+              location.pathname.startsWith(prefix),
+            );
+
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === "/"}
+                className={({ isActive }) =>
+                  cn(
+                    buttonVariants({ variant: "ghost" }),
+                    isActive || isPrefixActive
+                      ? "bg-teal-200 text-teal-700 font-bold hover:bg-teal-200 hover:text-teal-500"
+                      : "text-muted-foreground hover:bg-white hover:text-foreground",
+                  )
+                }
+              >
+                {item.label}
+              </NavLink>
+            );
+          })}
         </div>
 
         <div className="flex items-end justify-center">

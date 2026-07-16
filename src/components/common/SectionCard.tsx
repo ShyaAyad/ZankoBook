@@ -4,6 +4,9 @@ import {
   ChevronDown,
   Upload,
   FileText,
+  Link2,
+  StickyNote,
+  ClipboardList,
   Pen,
   Trash,
 } from "lucide-react";
@@ -27,10 +30,20 @@ interface SectionCardProps {
 const mimeToLabel = (mime: string) => {
   const map: Record<string, string> = {
     "application/pdf": "PDF",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-      "PPTX",
+    "image/jpeg": "JPG",
+    "image/png": "PNG",
+    "image/gif": "GIF",
+    "video/mp4": "MP4",
+    "video/quicktime": "MOV",
+    "video/x-msvideo": "AVI",
+    "application/msword": "DOC",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       "DOCX",
+    "application/vnd.ms-powerpoint": "PPT",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      "PPTX",
+    "application/vnd.ms-excel": "XLS",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "XLSX",
   };
   return map[mime] ?? mime?.split("/")[1]?.toUpperCase() ?? "FILE";
 };
@@ -41,12 +54,57 @@ const formatDate = (iso: string) =>
     day: "numeric",
   });
 
-const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
+type ItemKind = "lecture" | "link" | "note";
+
+// The backend always sends a `type` field: "note", "link", or a concrete
+// file-type string ("PDF", "DOC", "PPT", "XLS", "MP4", etc.) for uploads.
+// Note that link items also populate `material_file_url` (with the link
+// itself) and there is no separate `url` field in the API response, so
+// checking field presence can't distinguish link vs. lecture — `type` is
+// the only reliable signal.
+const getItemKind = (item: SectionItem): ItemKind => {
+  if (item.type === "link") return "link";
+  if (item.type === "note") return "note";
+  return "lecture";
+};
+
+const kindStyles: Record<
+  ItemKind,
+  { badge: string; label: string; icon: typeof FileText; text: string }
+> = {
+  lecture: {
+    badge: "bg-indigo-50 text-indigo-600",
+    label: "text-indigo-600",
+    icon: FileText,
+    text: "Lecture",
+  },
+  link: {
+    badge: "bg-violet-50 text-violet-600",
+    label: "text-violet-600",
+    icon: Link2,
+    text: "Link",
+  },
+  note: {
+    badge: "bg-amber-50 text-amber-600",
+    label: "text-amber-600",
+    icon: StickyNote,
+    text: "Note",
+  },
+};
+
+const SectionCard = ({
+  section,
+  index,
+  defaultOpen = false,
+}: SectionCardProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [activeModal, setActiveModal] = useState<
     "material" | "submission" | "edit" | null
   >(null);
   const [editingItem, setEditingItem] = useState<SectionItem | null>(null);
+  const [expandedItemIds, setExpandedItemIds] = useState<Set<number>>(
+    new Set(),
+  );
   const user = useUserStore((state) => state.user);
   const isLecturer = user?.roles[0].name === "lecturer";
   const queryClient = useQueryClient();
@@ -68,6 +126,18 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
     },
   });
 
+  const toggleDescription = (itemId: number) => {
+    setExpandedItemIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) {
+        next.delete(itemId);
+      } else {
+        next.add(itemId);
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
       {/* section tab */}
@@ -76,6 +146,9 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
         className="w-full flex items-center justify-between p-5"
       >
         <div className="flex items-center gap-4">
+          <div className="w-9 h-9 shrink-0 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-extrabold text-sm">
+            {index + 1}
+          </div>
           <div className="text-left">
             <p className="font-bold">{section.title}</p>
             <p className="text-sm text-gray-400">
@@ -85,7 +158,7 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {isLecturer && (
             <div className="flex items-center gap-2 text-sm">
               <button
@@ -93,7 +166,7 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
                   e.stopPropagation();
                   setActiveModal("edit");
                 }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500 transition-colors"
                 aria-label="Edit"
               >
                 <Pen size={14} />
@@ -104,7 +177,7 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
                   removeSection();
                 }}
                 disabled={isDeleting}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 transition-colors disabled:opacity-60"
+                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-transparent text-gray-500 transition-colors disabled:opacity-60"
                 aria-label="Delete"
               >
                 <Trash size={14} />
@@ -124,77 +197,128 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
         <div className="px-5">
           <div className="border-t border-gray-100" />
           <div className="divide-y divide-gray-100">
-            {section.items.map((item) => (
-              <div
-                key={`item-${item.id}`}
-                className="flex items-center justify-between py-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-gray-100" />
-                  <div>
-                    <p className="font-bold text-sm">
-                      {item.title || item.material_file_name}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {mimeToLabel(item.material_file_type)}
-                      {item.size && ` · ${item.size}`}
-                    </p>
+            {section.items.map((item) => {
+              const kind = getItemKind(item);
+              const style = kindStyles[kind];
+              const Icon = style.icon;
+              const hasDescription =
+                (kind === "note" || kind === "lecture") && !!item.description;
+              const isExpanded = expandedItemIds.has(item.id);
+
+              return (
+                <div key={`item-${item.id}`} className="py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${style.badge}`}
+                      >
+                        <Icon size={20} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm truncate">
+                          {item.title || "No title"}
+                        </p>
+                        <p
+                          className={`text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5 ${style.label}`}
+                        >
+                          <span className="w-1 h-1 rounded-full bg-current" />
+                          {style.text}
+                          {kind === "lecture" && (
+                            <span className="text-gray-400 normal-case font-medium">
+                              · {mimeToLabel(item.material_file_type)}
+                              {item.size && ` · ${item.size}`}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {hasDescription && (
+                        <button
+                          onClick={() => toggleDescription(item.id)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500 transition-colors"
+                          aria-label={
+                            isExpanded ? "Hide description" : "Show description"
+                          }
+                          aria-expanded={isExpanded}
+                        >
+                          {isExpanded ? (
+                            <ChevronUp size={14} />
+                          ) : (
+                            <ChevronDown size={14} />
+                          )}
+                        </button>
+                      )}
+                      {isLecturer && (
+                        <>
+                          <Button
+                            onClick={() => setEditingItem(item)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500 transition-colors"
+                          >
+                            <Pen size={14} />
+                          </Button>
+                          <Button
+                            onClick={() => removeSectionItem(item.id)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-transparent text-gray-500 transition-colors disabled:opacity-60"
+                          >
+                            <Trash size={14} />
+                          </Button>
+                        </>
+                      )}
+                      {(item.material_file_url || item.url) && (
+                        <a
+                          href={item.material_file_url || item.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="bg-teal-50 hover:bg-teal-600 hover:text-white transition-colors text-teal-700 font-semibold text-sm px-5 py-2 rounded-lg"
+                        >
+                          View
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {isLecturer && (
-                    <>
-                      <Button
-                        onClick={() => setEditingItem(item)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
-                      >
-                        <Pen size={14} />
-                      </Button>
-                      <Button
-                        onClick={() => removeSectionItem(item.id)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 transition-colors disabled:opacity-60"
-                      >
-                        <Trash size={14} />
-                      </Button>
-                    </>
+
+                  {hasDescription && isExpanded && (
+                    <div className="mt-3 ml-14 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3">
+                      <p className="text-sm text-gray-600 whitespace-pre-wrap">
+                        {item.description}
+                      </p>
+                    </div>
                   )}
-                  <a
-                    href={item.material_file_url || item.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="bg-teal-100 hover:bg-teal-200 transition-colors text-teal-600 font-semibold text-sm px-5 py-2 rounded-lg"
-                  >
-                    View
-                  </a>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {section.submissions.map((submission) => {
               const isGraded = submission.graded_at !== null;
               return (
                 <div
                   key={`submission-${submission.id}`}
-                  className="flex items-center justify-between py-4"
+                  className="flex items-center justify-between py-4 gap-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-teal-100" />
-                    <div>
-                      <p className="font-bold text-sm">{submission.title}</p>
-                      <p className="text-xs text-teal-500 font-medium">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-11 h-11 shrink-0 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                      <ClipboardList size={20} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-sm truncate">
+                        {submission.title}
+                      </p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-orange-600 flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-current" />
                         Due · {formatDate(submission.deadline)}
                       </p>
                     </div>
                   </div>
 
                   {isGraded ? (
-                    <span className="bg-teal-100 text-teal-600 font-semibold text-sm px-5 py-2 rounded-lg">
+                    <span className="bg-teal-50 text-teal-700 font-semibold text-sm px-5 py-2 rounded-lg shrink-0">
                       {submission.grade}
                       {submission.weight != null ? `/${submission.weight}` : ""}
                       · Grade
                     </span>
                   ) : (
-                    <button className="bg-teal-500 hover:bg-teal-600 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg">
+                    <button className="bg-teal-600 hover:bg-teal-700 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg shrink-0">
                       Upload
                     </button>
                   )}
@@ -206,14 +330,14 @@ const SectionCard = ({ section, defaultOpen = false }: SectionCardProps) => {
               <div className="flex gap-3 py-4">
                 <button
                   onClick={() => setActiveModal("material")}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 font-semibold text-sm py-3 rounded-xl"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gray-50 hover:bg-indigo-50 hover:text-indigo-600 border border-gray-100 hover:border-transparent transition-colors text-gray-700 font-semibold text-sm py-3 rounded-xl"
                 >
                   <Upload size={16} />
-                  Material
+                  Upload
                 </button>
                 <button
                   onClick={() => setActiveModal("submission")}
-                  className="flex-1 flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 font-semibold text-sm py-3 rounded-xl"
+                  className="flex-1 flex items-center justify-center gap-2 bg-gray-50 hover:bg-orange-50 hover:text-orange-600 border border-gray-100 hover:border-transparent transition-colors text-gray-700 font-semibold text-sm py-3 rounded-xl"
                 >
                   <FileText size={16} />
                   Submission

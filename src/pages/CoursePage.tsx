@@ -27,7 +27,7 @@ const CoursePage = () => {
           isLecturer ? "Courses you teach" : "Courses you are enrolled in",
         )}
         semester="semester 2"
-        year="2025-2025"
+        year="2025-2026"
       />
 
       <div className="grid grid-cols-3 gap-5 mt-5">

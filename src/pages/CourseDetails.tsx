@@ -14,7 +14,7 @@ const CourseDetails = () => {
   const user = useUserStore((state) => state.user);
   const isLecturer = user?.roles?.[0]?.name === "lecturer";
 
-  const studentCourse = useStudentCourse(courseId);
+  const studentCourse = useStudentCourse(courseId, !isLecturer);
   const lecturerCourse = useLecturerCourse(courseId);
   const { data: course } = isLecturer ? lecturerCourse : studentCourse;
 
