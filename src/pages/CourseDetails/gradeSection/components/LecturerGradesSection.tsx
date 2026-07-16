@@ -5,13 +5,13 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import useLecturerCourse from "@/hooks/useLecturerCourse";
 
 import { getCourseGradebook } from "@/api/grades";
 
 import StudentGradeRow from "@/components/common/grades/StudentGradeRow";
+import LecturerGradesSectionSkeleton from "@/components/common/grades/LecturerGradesSectionSkeleton";
 import EditAssessmentsModal from "@/components/common/grades/EditAssessmentsModal";
 import EmptyState from "@/components/common/EmptyState";
 import { saveStudentGrades } from "@/api/grades";
@@ -94,17 +94,11 @@ const LecturerGradesSection = () => {
     initializeState();
   }, [gradebook]);
 
-  if (!gradebook) return null;
-
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-52" />
-        <Skeleton className="h-130 rounded-3xl" />
-        <Skeleton className="h-12 w-72 rounded-xl" />
-      </div>
-    );
+    return <LecturerGradesSectionSkeleton />;
   }
+
+  if (!gradebook) return null;
 
   if (!hasAssessments) {
     return (
