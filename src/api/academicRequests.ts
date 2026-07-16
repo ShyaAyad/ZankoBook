@@ -8,7 +8,6 @@ import type {
 
 export async function makeAcademicRequest(
   payload: AcademicRequestPayload,
-  // department_id?: number,
 ): Promise<AcademicRequest> {
   const formData = new FormData();
 
