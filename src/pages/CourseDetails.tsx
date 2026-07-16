@@ -20,12 +20,6 @@ const CourseDetails = () => {
   const lecturerCourse = useLecturerCourse(courseId);
   const { data: course } = isLecturer ? lecturerCourse : studentCourse;
 
-  const { data: sections = [] } = useQuery({
-    queryKey: ["course-sections", courseId],
-    queryFn: () => getCourseSections(courseId!),
-    enabled: !!courseId,
-  });
-
   if (!course) return null;
 
   return (
@@ -37,7 +31,7 @@ const CourseDetails = () => {
         onTabChange={setActiveTab}
       />
 
-      {activeTab === "content" && <ContentSection sections={sections} />}
+      {activeTab === "content" && <ContentSection />}
       {activeTab === "attendance" && <AttendancePage />}
       {activeTab === "grades" && <GradesSection />}
     </div>
