@@ -1,3 +1,4 @@
+import type { Attachment } from "./academicRequests";
 import type { User } from "./auth";
 
 export interface Department {
@@ -40,13 +41,17 @@ export type CourseSectionPayload = {
 };
 
 export type AddSectionItemPayload = {
-  material_file_name: string;
-  file: File;
+  title: string;
+  description?: string;
+  file?: File;
+  url?: string;
 };
 
 export interface SectionItemPayload {
-  material_file_name: string;
-  file: File[];
+  title: string;
+  description?: string;
+  file?: File;
+  url?: string;
 }
 
 export interface GradeAndFeedbackPayload {
@@ -61,28 +66,27 @@ export interface SectionItem {
   title: string;
   type: string;
   url: string;
-  content: string | null;
+  description: string | null;
   size: string;
   material_file_type: string;
-  material_file_name: string;
   material_file_url: string;
   created_at: string;
   updated_at: string;
 }
 
-export interface Submission {
-  id: number;
-  title: string;
-  description: string;
-  deadline: string;
-  weight: number | null;
-  attachments: unknown[];
-  grade: number | null;
-  feedback: string | null;
-  graded_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+// export interface Submission {
+//   id: number;
+//   title: string;
+//   description: string;
+//   deadline: string;
+//   weight: number | null;
+//   attachments: unknown[];
+//   grade: number | null;
+//   feedback: string | null;
+//   graded_at: string | null;
+//   created_at: string;
+//   updated_at: string;
+// }
 
 export interface CourseSection {
   id: number;
@@ -100,7 +104,47 @@ export interface CourseSection {
     updated_at: string;
   };
   items: SectionItem[];
-  submissions: Submission[];
+  submissions: CourseAssignmentResponse[];
   created_at: string;
   updated_at: string;
+}
+
+export interface CourseAssignmentPayload {
+  title: string;
+  description: string;
+  deadline: string;
+  files: File[];
+}
+
+export interface CourseAssignmentResponse {
+  id: number;
+  title: string;
+  description: string;
+  deadline: string;
+  weight: number | null;
+  section: {
+    id: number;
+    title: string;
+  };
+  attachments: Attachment[];
+  grade: number | null;
+  feedback: string | null;
+  graded_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CourseAssessmentResponse {
+  id: number | null;
+  course_id: number | null;
+  academic_year_id: number | null;
+  type: string;
+  max_mark: number | null;
+  title: string;
+  weight: number | null;
+  due_at: string;
+  teacher_id: number | null;
+  is_published: boolean;
+  updated_at: string;
+  created_at: string;
 }

@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCourseById } from "@/api/courses/student";
 import type { Course } from "@/types/course";
 
-const useStudentCourse = (courseId?: string) => {
+const useStudentCourse = (courseId?: string, enabled: boolean = true) => {
   const queryClient = useQueryClient();
 
   return useQuery<Course>({
@@ -12,7 +12,7 @@ const useStudentCourse = (courseId?: string) => {
       const cachedCourses = queryClient.getQueryData<Course[]>(["courses"]);
       return cachedCourses?.find((c) => c.id === Number(courseId));
     },
-    enabled: !!courseId,
+    enabled: !!courseId && enabled,
   });
 };
 

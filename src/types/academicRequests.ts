@@ -10,7 +10,7 @@ export interface AcademicRequestPayload {
   files?: File[];
 }
 
-interface Attachment {
+export interface Attachment {
   id: number;
   file_name: string;
   file_url: string;
