@@ -7,6 +7,8 @@ import useLecturerCourse from "@/hooks/useLecturerCourse";
 import { useUserStore } from "@/store/userStore";
 import AttendancePage from "@/pages/CourseDetails/attendanceSection/index";
 import GradesSection from "@/pages/CourseDetails/gradeSection/index";
+import CourseTeachersPage from "./CourseTeachersPage";
+import CourseStudentsPage from "./CourseStudentsPage";
 
 const CourseDetails = () => {
   const { courseId } = useParams();
@@ -27,11 +29,15 @@ const CourseDetails = () => {
         title={course.name}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        isLecturer={isLecturer}
       />
 
       {activeTab === "content" && <ContentSection />}
       {activeTab === "attendance" && <AttendancePage />}
       {activeTab === "grades" && <GradesSection />}
+      {isLecturer
+        ? activeTab === "students" && <CourseStudentsPage />
+        : activeTab === "teachers" && <CourseTeachersPage />}
     </div>
   );
 };

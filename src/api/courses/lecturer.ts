@@ -31,9 +31,20 @@ export async function getCourseSubmissionSummary(id: string) {
 
 export async function getCourseSections(id: string) {
   const response = await api.get(`/api/moodle/courses/${id}/sections`);
+
   const { success, message, data } = response.data;
 
   if (!success) throw new Error(message);
 
   return data.data;
+}
+
+export async function getCourseLectuers(courseId: string | number) {
+  const response = await api.get(`/api/moodle/courses/${courseId}/teachers`);
+
+  const { success, message, data } = response.data;
+
+  if (!success) throw new Error(message);
+
+  return data;
 }

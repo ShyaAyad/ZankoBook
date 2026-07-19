@@ -1,4 +1,5 @@
 import type { Attachment } from "./academicRequests";
+import type { ApiResponse } from "./api";
 import type { User } from "./auth";
 
 export interface Department {
@@ -74,20 +75,6 @@ export interface SectionItem {
   updated_at: string;
 }
 
-// export interface Submission {
-//   id: number;
-//   title: string;
-//   description: string;
-//   deadline: string;
-//   weight: number | null;
-//   attachments: unknown[];
-//   grade: number | null;
-//   feedback: string | null;
-//   graded_at: string | null;
-//   created_at: string;
-//   updated_at: string;
-// }
-
 export interface CourseSection {
   id: number;
   title: string;
@@ -148,3 +135,24 @@ export interface CourseAssessmentResponse {
   updated_at: string;
   created_at: string;
 }
+
+export interface CourseTeacherPivot {
+  course_id: number;
+  teacher_id: number;
+  role: "primary_lecturer" | "assistant" | "guest_lecturer";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CourseTeacher {
+  id: number;
+  user_id: number;
+  pivot: CourseTeacherPivot;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
+export type GetCourseTeachersResponse = ApiResponse<{ data: CourseTeacher[] }>;
