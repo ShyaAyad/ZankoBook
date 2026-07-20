@@ -291,6 +291,7 @@ const SectionCard = ({
 
             {section.submissions.map((submission) => {
               const assessment = submission.course_assessment;
+              console.log("ASSESSMENT: ", assessment);
 
               if (isLecturer) {
                 return (

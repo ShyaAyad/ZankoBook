@@ -148,15 +148,38 @@ export interface CourseAssessmentResponse {
   id: number | null;
   course_id: number | null;
   academic_year_id: number | null;
-  type: string;
+  type?: string;
   max_mark: number | null;
   title: string;
   weight: number | null;
   due_at: string;
   teacher_id: number | null;
-  is_published: boolean;
+  is_published?: boolean;
   updated_at: string;
   created_at: string;
+}
+
+export interface CourseAssessment {
+  id: number;
+  course_id: number;
+  teacher_id: number;
+  academic_year_id: number;
+  title: string;
+  max_mark: string;
+  weight: string;
+  due_at: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export interface Submission {
+  id: number;
+  description: string;
+  course_assessment: CourseAssessment;
+  attachments: Attachment[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CourseTeacherPivot {

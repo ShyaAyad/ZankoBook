@@ -5,7 +5,7 @@ import { getMySubmission } from "@/api/courses/student";
 import UploadAssignmentModal from "./UploadAssignmentModal";
 import SubmissionPreviewModal from "./SubmissionPreviewModal";
 import type { StudentSubmission } from "@/types/submission";
-import type { CourseAssessmentResponse } from "@/types/course";
+import type { CourseAssessment } from "@/types/course";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, {
@@ -15,7 +15,7 @@ const formatDate = (iso: string) =>
 
 interface StudentSubmissionRowProps {
   submissionId: number;
-  assessment: CourseAssessmentResponse;
+  assessment: CourseAssessment;
 }
 
 const StudentSubmissionRow = ({
@@ -25,25 +25,10 @@ const StudentSubmissionRow = ({
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const {
-    data: attachments = [],
-    isLoading,
-    error,
-  } = useQuery<StudentSubmission[]>({
+  const { data: attachments = [] } = useQuery<StudentSubmission[]>({
     queryKey: ["my-submission", submissionId],
     queryFn: () => getMySubmission(submissionId),
   });
-
-  if (!isLoading) {
-    console.log(
-      "RESOLVED — submissionId:",
-      submissionId,
-      "attachments:",
-      attachments,
-      "error:",
-      error,
-    );
-  }
 
   return (
     <div className="flex items-center justify-between py-4 gap-4">
