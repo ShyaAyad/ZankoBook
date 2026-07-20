@@ -13,7 +13,7 @@ const EditAssignmentModal = ({
 }) => {
   const [title, setTitle] = useState(assignment.title);
   const [description, setDescription] = useState(assignment.description);
-  const [deadline, setDeadline] = useState(assignment.deadline.split("T")[0]);
+  const [deadline, setDeadline] = useState(assignment.due_at.split("T")[0]);
   const [files, setFiles] = useState<File[]>([]);
   const queryClient = useQueryClient();
 
