@@ -15,18 +15,18 @@ const CourseCard = ({
   title,
   sections,
   students,
-  color = "bg-orange-500",
-  onClick
+  color,
+  onClick,
 }: CourseInfoProps) => {
   return (
     <div
       onClick={onClick}
       className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full"
     >
-      <div className={`h-1.5 ${color}`} />
+      <div className={`h-1.5`} style={{ backgroundColor: color }} />
 
       <div className="p-5 flex flex-col flex-1">
-        <Badge className={`${color} text-white hover:${color} mb-3`}>
+        <Badge className={`text-white mb-3`} style={{ backgroundColor: color }}>
           {code}
         </Badge>
 
