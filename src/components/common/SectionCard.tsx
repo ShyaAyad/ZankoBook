@@ -6,7 +6,6 @@ import {
   FileText,
   Link2,
   StickyNote,
-  ClipboardList,
   Pen,
   Trash,
 } from "lucide-react";
@@ -20,6 +19,10 @@ import MaterialModal from "./MaterialModal";
 import { Button } from "../ui/button";
 import { deleteSectionItem } from "@/api/sectionItem";
 import EditMaterialModal from "./EditMaterialModal";
+import GradeSubmissionModal from "./GradeSubmissionModal";
+import StudentSubmissionRow from "./StudentSubmissionRow";
+import { getStudentSubmissions } from "@/api/courses/lecturer";
+import type { StudentSubmission } from "@/types/submission";
 
 interface SectionCardProps {
   section: CourseSection;
@@ -48,20 +51,8 @@ const mimeToLabel = (mime: string) => {
   return map[mime] ?? mime?.split("/")[1]?.toUpperCase() ?? "FILE";
 };
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
-
 type ItemKind = "lecture" | "link" | "note";
 
-// The backend always sends a `type` field: "note", "link", or a concrete
-// file-type string ("PDF", "DOC", "PPT", "XLS", "MP4", etc.) for uploads.
-// Note that link items also populate `material_file_url` (with the link
-// itself) and there is no separate `url` field in the API response, so
-// checking field presence can't distinguish link vs. lecture — `type` is
-// the only reliable signal.
 const getItemKind = (item: SectionItem): ItemKind => {
   if (item.type === "link") return "link";
   if (item.type === "note") return "note";
@@ -105,11 +96,19 @@ const SectionCard = ({
   const [expandedItemIds, setExpandedItemIds] = useState<Set<number>>(
     new Set(),
   );
+  const [gradingAttachments, setGradingAttachments] = useState<
+    StudentSubmission[] | null
+  >(null);
+  const [gradingContext, setGradingContext] = useState<{
+    assessmentId: number;
+    maxScore: string | number;
+  } | null>(null);
   const user = useUserStore((state) => state.user);
   const isLecturer = user?.roles[0].name === "lecturer";
   const queryClient = useQueryClient();
   const courseId = section.course.id;
 
+  // delete section
   const { mutate: removeSection, isPending: isDeleting } = useMutation({
     mutationKey: ["deleteSection", section.id],
     mutationFn: () => deleteSection(section.id),
@@ -118,6 +117,7 @@ const SectionCard = ({
     },
   });
 
+  // delete section item
   const { mutate: removeSectionItem } = useMutation({
     mutationKey: ["deleteSectionItem"],
     mutationFn: (itemId: number) => deleteSectionItem(itemId),
@@ -290,39 +290,42 @@ const SectionCard = ({
             })}
 
             {section.submissions.map((submission) => {
-              const isGraded = submission.graded_at !== null;
-              return (
-                <div
-                  key={`submission-${submission.id}`}
-                  className="flex items-center justify-between py-4 gap-4"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-11 h-11 shrink-0 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
-                      <ClipboardList size={20} />
-                    </div>
+              const assessment = submission.course_assessment;
+
+              if (isLecturer) {
+                return (
+                  <div
+                    key={`submission-${submission.id}`}
+                    className="flex items-center justify-between py-4 gap-4"
+                  >
                     <div className="min-w-0">
                       <p className="font-bold text-sm truncate">
-                        {submission.title}
-                      </p>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-orange-600 flex items-center gap-1.5">
-                        <span className="w-1 h-1 rounded-full bg-current" />
-                        Due · {formatDate(submission.deadline)}
+                        {assessment.title}
                       </p>
                     </div>
-                  </div>
-
-                  {isGraded ? (
-                    <span className="bg-teal-50 text-teal-700 font-semibold text-sm px-5 py-2 rounded-lg shrink-0">
-                      {submission.grade}
-                      {submission.weight != null ? `/${submission.weight}` : ""}
-                      · Grade
-                    </span>
-                  ) : (
-                    <button className="bg-teal-600 hover:bg-teal-700 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg shrink-0">
-                      Upload
+                    <button
+                      onClick={async () => {
+                        const data = await getStudentSubmissions(assessment.id);
+                        setGradingAttachments(data);
+                        setGradingContext({
+                          assessmentId: assessment.id,
+                          maxScore: assessment.max_mark,
+                        });
+                      }}
+                      className="bg-teal-600 hover:bg-teal-700 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg shrink-0"
+                    >
+                      Grade
                     </button>
-                  )}
-                </div>
+                  </div>
+                );
+              }
+
+              return (
+                <StudentSubmissionRow
+                  key={`submission-${submission.id}`}
+                  submissionId={submission.id}
+                  assessment={assessment}
+                />
               );
             })}
 
@@ -373,6 +376,17 @@ const SectionCard = ({
         <EditMaterialModal
           item={editingItem}
           onClose={() => setEditingItem(null)}
+        />
+      )}
+      {gradingAttachments !== null && gradingContext && (
+        <GradeSubmissionModal
+          assessmentId={gradingContext.assessmentId}
+          attachments={gradingAttachments}
+          maxScore={gradingContext.maxScore}
+          onClose={() => {
+            setGradingAttachments(null);
+            setGradingContext(null);
+          }}
         />
       )}
     </div>

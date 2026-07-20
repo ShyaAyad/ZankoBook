@@ -12,7 +12,9 @@ const SubmissionModal = ({
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [weight, setWeight] = useState("");
+  const [maxMark, setMaxMark] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -24,7 +26,14 @@ const SubmissionModal = ({
   } = useMutation({
     mutationKey: ["addAssignment", sectionId],
     mutationFn: () =>
-      addAssignment(sectionId, { title, description, deadline, files }),
+      addAssignment(sectionId, {
+        title,
+        description,
+        due_at: dueDate,
+        weight,
+        max_mark: maxMark,
+        files,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["course-sections"] });
       onClose();
@@ -36,8 +45,10 @@ const SubmissionModal = ({
   };
 
   const handleSubmit = () => {
-    if (!title || !description || !deadline) {
-      setValidationError("Title, description, and due date are required.");
+    if (!title || !description || !dueDate || !weight || !maxMark) {
+      setValidationError(
+        "Title, description, due date/time, weight, and max mark are required.",
+      );
       return;
     }
     setValidationError(null);
@@ -46,7 +57,7 @@ const SubmissionModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold">Submission</h2>
           <button
@@ -78,10 +89,35 @@ const SubmissionModal = ({
         <label className="block text-sm font-semibold mb-2">Due date</label>
         <input
           type="date"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 mb-4 outline-none focus:border-teal-400"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-teal-400"
         />
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label className="block text-sm font-semibold mb-2">Weight</label>
+            <input
+              type="number"
+              min="0"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              placeholder="e.g. 10"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-teal-400"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-2">Max mark</label>
+            <input
+              type="number"
+              min="0"
+              value={maxMark}
+              onChange={(e) => setMaxMark(e.target.value)}
+              placeholder="e.g. 100"
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-teal-400"
+            />
+          </div>
+        </div>
 
         <label className="flex items-center gap-3 border border-dashed border-gray-300 rounded-xl px-4 py-4 mb-6 cursor-pointer hover:bg-gray-50 transition-colors">
           <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-teal-100 text-teal-600">

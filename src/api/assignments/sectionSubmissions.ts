@@ -12,8 +12,10 @@ export async function addAssignment(
   const formData = new FormData();
   formData.append("title", payload.title);
   formData.append("description", payload.description);
-  formData.append("deadline", payload.deadline);
-  payload.files.forEach((file) => {
+  formData.append("due_at", payload.due_at);
+  formData.append("weight", payload.weight);
+  formData.append("max_mark", payload.max_mark);
+  payload?.files?.forEach((file) => {
     formData.append("files[]", file);
   });
 
