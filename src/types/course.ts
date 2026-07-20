@@ -74,19 +74,26 @@ export interface SectionItem {
   updated_at: string;
 }
 
-// export interface Submission {
-//   id: number;
-//   title: string;
-//   description: string;
-//   deadline: string;
-//   weight: number | null;
-//   attachments: unknown[];
-//   grade: number | null;
-//   feedback: string | null;
-//   graded_at: string | null;
-//   created_at: string;
-//   updated_at: string;
-// }
+export interface Submission {
+  id: number;
+  description: string;
+  course_assessment: {
+    id: number;
+    course_id: number;
+    teacher_id: number;
+    academic_year_id: number;
+    title: string;
+    max_mark: string;
+    weight: string;
+    due_at: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+  };
+  attachments: Attachment[];
+  created_at: string;
+  updated_at: string;
+}
 
 export interface CourseSection {
   id: number;
@@ -104,7 +111,7 @@ export interface CourseSection {
     updated_at: string;
   };
   items: SectionItem[];
-  submissions: CourseAssignmentResponse[];
+  submissions: Submission[];
   created_at: string;
   updated_at: string;
 }
@@ -112,15 +119,17 @@ export interface CourseSection {
 export interface CourseAssignmentPayload {
   title: string;
   description: string;
-  deadline: string;
-  files: File[];
+  due_at: string;
+  weight: string;
+  max_mark: string;
+  files?: File[];
 }
 
 export interface CourseAssignmentResponse {
   id: number;
   title: string;
   description: string;
-  deadline: string;
+  due_at: string;
   weight: number | null;
   section: {
     id: number;
