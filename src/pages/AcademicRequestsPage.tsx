@@ -63,8 +63,12 @@ const AcademicRequestsPage = () => {
               subject={request.subject}
               description={request.description}
               dateIssued={request.created_at}
-              attachmentCount={request.attachments.length}
-              onViewLetter={() => console.log("view letter", request.id)}
+              attachments={request.attachments.map((a) => ({
+                id: String(a.id),
+                name: a.file_name,
+                url: a.file_url,
+                type: a.file_type,
+              }))}
             />
           ))}
         </div>

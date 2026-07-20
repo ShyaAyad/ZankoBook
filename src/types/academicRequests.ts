@@ -37,5 +37,12 @@ export interface AcademicRequest {
   attachments: Attachment[];
 }
 
+export interface RequestAttachment {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+}
+
 export type SendAcademicRequestResponse = ApiResponse<AcademicRequest>;
 export type GetAcademicRequestsResponse = ApiResponse<AcademicRequest[]>;
