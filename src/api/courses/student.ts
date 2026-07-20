@@ -24,6 +24,7 @@ export async function getCourseById(id: string) {
 
 export async function getCourseSections(id: string) {
   const response = await api.get(`/api/moodle/courses/${id}/sections`);
+
   const { success, message, data } = response.data;
 
   if (!success) throw new Error(message);

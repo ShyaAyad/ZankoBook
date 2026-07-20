@@ -33,6 +33,7 @@ export async function getCourseSubmissionSummary(id: string) {
 
 export async function getCourseSections(id: string) {
   const response = await api.get(`/api/moodle/courses/${id}/sections`);
+
   const { success, message, data } = response.data;
 
   if (!success) throw new Error(message);
@@ -40,12 +41,19 @@ export async function getCourseSections(id: string) {
   return data.data;
 }
 
-export async function getStudentSubmissions(
-  submissionId: string | number,
-): Promise<StudentSubmission[]> {
+export async function getCourseSubmissionSummary(id: string) {
   const response = await api.get(
-    `/api/moodle/section-submissions/${submissionId}/student-submissions`,
+    `/api/moodle/lecturer/courses/${id}/submissions-summary`,
   );
+  const { success, message, data } = response.data;
+
+  if (!success) throw new Error(message);
+
+  return data;
+}
+  
+export async function getCourseLectuers(courseId: string | number) {
+  const response = await api.get(`/api/moodle/courses/${courseId}/teachers`);
 
   const { success, message, data } = response.data;
 
@@ -53,7 +61,6 @@ export async function getStudentSubmissions(
 
   return data;
 }
-
 export async function saveMarks(
   assessmentId: string | number,
   payload: MarksPayload,

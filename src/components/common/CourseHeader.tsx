@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
-export type CourseTab = "content" | "attendance" | "grades";
+export type CourseTab =
+  | "content"
+  | "attendance"
+  | "grades"
+  | "teachers"
+  | "students";
 
 interface CourseHeaderProps {
   code: string;
@@ -11,9 +16,10 @@ interface CourseHeaderProps {
   colorText?: string;
   activeTab: CourseTab;
   onTabChange: (tab: CourseTab) => void;
+  isLecturer: boolean;
 }
 
-const tabs: { key: CourseTab; label: string }[] = [
+const baseTabs: { key: CourseTab; label: string }[] = [
   { key: "content", label: "Content" },
   { key: "attendance", label: "Attendance" },
   { key: "grades", label: "Grades" },
@@ -25,9 +31,17 @@ const CourseHeader = ({
   colorText = "text-orange-500",
   activeTab,
   onTabChange,
+  isLecturer,
 }: CourseHeaderProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const tabs: { key: CourseTab; label: string }[] = [
+    ...baseTabs,
+    isLecturer
+      ? { key: "students", label: "Students" }
+      : { key: "teachers", label: "Teachers" },
+  ];
 
   return (
     <div className="flex items-start justify-between mb-5">
