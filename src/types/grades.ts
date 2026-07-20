@@ -155,6 +155,15 @@ export interface SaveGradebookResult {
   recalculated_students_count: number;
 }
 
+export interface MarkSubmissionPayload {
+  student_id: number;
+  mark: number;
+  feedback: string | null;
+}
+
+export interface MarksPayload {
+  marks: MarkSubmissionPayload[];
+}
 /* -------------------------------------------------------------------------- */
 /*                                 Responses                                  */
 /* -------------------------------------------------------------------------- */
@@ -164,3 +173,4 @@ export type GetGradebookResponse = ApiResponse<Gradebook>;
 export type UpdateCourseAssessmentsResponse = ApiResponse<CourseAssessment[]>;
 export type SaveGradebookResponse = ApiResponse<SaveGradebookResult>;
 export type ModifyAssessmentsResponse = ApiResponse<CourseAssessment[]>;
+export type MarksResponse = ApiResponse<unknown>;
