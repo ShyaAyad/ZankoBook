@@ -6,6 +6,7 @@ import { useUserStore } from "@/store/userStore";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import CourseCardSkeleton from "@/components/common/CourseCardSkeleton";
+import { getCourseColor } from "@/lib/courseColor";
 
 const CoursePage = () => {
   const user = useUserStore((state) => state.user);
@@ -40,6 +41,7 @@ const CoursePage = () => {
                 key={course.id}
                 code={course.code}
                 title={course.name}
+                color={getCourseColor(course)}
                 students={course.students_count}
                 sections={course.sections_count}
                 onClick={() => navigate(`/courses/${course.id}`)}
