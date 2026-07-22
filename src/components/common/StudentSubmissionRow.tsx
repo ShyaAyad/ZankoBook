@@ -16,11 +16,19 @@ const formatDate = (iso: string) =>
 interface StudentSubmissionRowProps {
   submissionId: number;
   assessment: CourseAssessment;
+  isLecturer: boolean;
+  isAllowedToModify: boolean;
+  isPrimaryLecturer: boolean;
+  grade: () => Promise<void>;
 }
 
 const StudentSubmissionRow = ({
   submissionId,
   assessment,
+  isLecturer,
+  isPrimaryLecturer,
+  isAllowedToModify,
+  grade,
 }: StudentSubmissionRowProps) => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -46,7 +54,19 @@ const StudentSubmissionRow = ({
         </div>
       </div>
 
-      {attachments.length > 0 ? (
+      {(isLecturer && isAllowedToModify) ||
+      (isLecturer && isPrimaryLecturer) ? (
+        <button
+          onClick={grade}
+          className="bg-teal-600 hover:bg-teal-700 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg shrink-0"
+        >
+          Grade
+        </button>
+      ) : isLecturer && !isAllowedToModify && !isPrimaryLecturer ? (
+        <>
+          <p>Not yours to grade</p>
+        </>
+      ) : !isLecturer && attachments.length > 0 ? (
         <button
           onClick={() => setIsPreviewOpen(true)}
           className="bg-teal-50 hover:bg-teal-600 hover:text-white transition-colors text-teal-700 font-semibold text-sm px-5 py-2 rounded-lg shrink-0"

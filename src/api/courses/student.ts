@@ -3,6 +3,7 @@ import type {
   StudentSubmission,
   StudentSubmissionPayload,
 } from "@/types/submission";
+import type { CourseSection, GetCourseSectionsResponse } from "@/types/course";
 
 export async function courses() {
   const response = await api.get("/api/moodle/my-courses");
@@ -22,8 +23,10 @@ export async function getCourseById(id: string) {
   return data;
 }
 
-export async function getCourseSections(id: string) {
-  const response = await api.get(`/api/moodle/courses/${id}/sections`);
+export async function getCourseSections(id: string): Promise<CourseSection[]> {
+  const response = await api.get<GetCourseSectionsResponse>(
+    `/api/moodle/courses/${id}/sections`,
+  );
 
   const { success, message, data } = response.data;
 

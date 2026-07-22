@@ -20,6 +20,15 @@ const CoursePage = () => {
     ? lecturerCourses
     : studentCourses;
 
+  console.log("Courses are: ", courses);
+
+  function formatRole(role: string): string {
+    if (!role) return "";
+    return role
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
   return (
     <div className="mx-[20%]">
       <PageHeader
@@ -41,6 +50,7 @@ const CoursePage = () => {
                 key={course.id}
                 code={course.code}
                 title={course.name}
+                role={formatRole(course.role)}
                 color={getCourseColor(course)}
                 students={course.students_count}
                 sections={course.sections_count}

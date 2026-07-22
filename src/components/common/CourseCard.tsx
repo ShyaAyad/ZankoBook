@@ -1,9 +1,10 @@
 import { Badge } from "../ui/badge";
-import { Calendar, Users } from "lucide-react";
+import { Calendar, Users, GraduationCap } from "lucide-react";
 
 interface CourseInfoProps {
   code: string;
   title: string;
+  role: string;
   sections: number;
   students: number;
   color?: string;
@@ -13,6 +14,7 @@ interface CourseInfoProps {
 const CourseCard = ({
   code,
   title,
+  role,
   sections,
   students,
   color,
@@ -23,12 +25,24 @@ const CourseCard = ({
       onClick={onClick}
       className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full"
     >
-      <div className={`h-1.5`} style={{ backgroundColor: color }} />
+      <div className="h-1.5" style={{ backgroundColor: color }} />
 
       <div className="p-5 flex flex-col flex-1">
-        <Badge className={`text-white mb-3`} style={{ backgroundColor: color }}>
-          {code}
-        </Badge>
+        <div className="flex items-center justify-between mb-3">
+          <Badge className="text-white" style={{ backgroundColor: color }}>
+            {code}
+          </Badge>
+          <span
+            className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
+            style={{
+              backgroundColor: color ? `${color}1A` : "#f3f4f6",
+              color: color || "#374151",
+            }}
+          >
+            <GraduationCap size={13} />
+            {role}
+          </span>
+        </div>
 
         <p className="font-bold text-xl mb-3 flex-1">{title}</p>
 
