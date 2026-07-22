@@ -28,6 +28,7 @@ interface SectionCardProps {
   section: CourseSection;
   index: number;
   defaultOpen?: boolean;
+  teacherRole: string;
 }
 
 const mimeToLabel = (mime: string) => {
@@ -87,6 +88,7 @@ const SectionCard = ({
   section,
   index,
   defaultOpen = false,
+  teacherRole,
 }: SectionCardProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [activeModal, setActiveModal] = useState<
@@ -105,6 +107,29 @@ const SectionCard = ({
   } | null>(null);
   const user = useUserStore((state) => state.user);
   const isLecturer = user?.roles[0].name === "lecturer";
+
+  // getting the roles
+  const isPrimaryLecturer = teacherRole === "primary_lecturer";
+  const isAssistantLecturer = teacherRole === "assistant_lecturer";
+  const isLabInstructor = teacherRole === "lab_instructor";
+
+  // getting teacher id
+  const teacherId = section?.teacher.user.id;
+  const isAllowedToModify = user?.id == teacherId;
+
+  console.log(
+    "teacher id is: ",
+    teacherId,
+    " user ID is: ",
+    user?.id,
+    " Is allowed ot modify, ",
+    isAllowedToModify,
+    " teacher role is: ",
+    teacherRole,
+    " is primary: ",
+    isPrimaryLecturer,
+  );
+
   const queryClient = useQueryClient();
   const courseId = section.course.id;
 
@@ -161,27 +186,31 @@ const SectionCard = ({
         <div className="flex items-center gap-2">
           {isLecturer && (
             <div className="flex items-center gap-2 text-sm">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveModal("edit");
-                }}
-                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500 transition-colors"
-                aria-label="Edit"
-              >
-                <Pen size={14} />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeSection();
-                }}
-                disabled={isDeleting}
-                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-transparent text-gray-500 transition-colors disabled:opacity-60"
-                aria-label="Delete"
-              >
-                <Trash size={14} />
-              </button>
+              {(isAllowedToModify || isPrimaryLecturer) && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveModal("edit");
+                  }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500 transition-colors"
+                  aria-label="Edit"
+                >
+                  <Pen size={14} />
+                </button>
+              )}
+              {(isAllowedToModify || isPrimaryLecturer) && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeSection();
+                  }}
+                  disabled={isDeleting}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-transparent text-gray-500 transition-colors disabled:opacity-60"
+                  aria-label="Delete"
+                >
+                  <Trash size={14} />
+                </button>
+              )}
             </div>
           )}
           {isOpen ? (
@@ -249,22 +278,23 @@ const SectionCard = ({
                           )}
                         </button>
                       )}
-                      {isLecturer && (
-                        <>
-                          <Button
-                            onClick={() => setEditingItem(item)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500 transition-colors"
-                          >
-                            <Pen size={14} />
-                          </Button>
-                          <Button
-                            onClick={() => removeSectionItem(item.id)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-transparent text-gray-500 transition-colors disabled:opacity-60"
-                          >
-                            <Trash size={14} />
-                          </Button>
-                        </>
-                      )}
+                      {isLecturer &&
+                        (isAllowedToModify || isPrimaryLecturer) && (
+                          <>
+                            <Button
+                              onClick={() => setEditingItem(item)}
+                              className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500 transition-colors"
+                            >
+                              <Pen size={14} />
+                            </Button>
+                            <Button
+                              onClick={() => removeSectionItem(item.id)}
+                              className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-transparent text-gray-500 transition-colors disabled:opacity-60"
+                            >
+                              <Trash size={14} />
+                            </Button>
+                          </>
+                        )}
                       {(item.material_file_url || item.url) && (
                         <a
                           href={item.material_file_url || item.url}
@@ -291,9 +321,11 @@ const SectionCard = ({
 
             {section.submissions.map((submission) => {
               const assessment = submission.course_assessment;
-              console.log("ASSESSMENT: ", assessment);
 
-              if (isLecturer) {
+              if (
+                (isLecturer && isAllowedToModify) ||
+                (isLecturer && isPrimaryLecturer)
+              ) {
                 return (
                   <div
                     key={`submission-${submission.id}`}
@@ -326,6 +358,17 @@ const SectionCard = ({
                   key={`submission-${submission.id}`}
                   submissionId={submission.id}
                   assessment={assessment}
+                  isLecturer={isLecturer}
+                  isPrimaryLecturer={isPrimaryLecturer}
+                  isAllowedToModify={isAllowedToModify}
+                  grade={async () => {
+                    const data = await getStudentSubmissions(assessment.id);
+                    setGradingAttachments(data);
+                    setGradingContext({
+                      assessmentId: assessment.id,
+                      maxScore: assessment.max_mark,
+                    });
+                  }}
                 />
               );
             })}

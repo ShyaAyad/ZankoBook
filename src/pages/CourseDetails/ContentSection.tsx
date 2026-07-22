@@ -10,6 +10,7 @@ import { getCourseSections } from "@/api/courses/student";
 import { useQuery } from "@tanstack/react-query";
 import SectionCardSkeleton from "@/components/common/SectionCardSkeleton";
 import EmptyState from "@/components/common/EmptyState";
+import useLecturerCourse from "@/hooks/useLecturerCourse";
 
 const ContentSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,6 +23,15 @@ const ContentSection = () => {
     queryFn: () => getCourseSections(courseId!),
     enabled: !!courseId,
   });
+
+  const { data: course, isLoading: isCourseLoading } = useLecturerCourse(
+    courseId,
+    isLecturer,
+  );
+
+  console.log(course);
+
+  const isContentLoading = isLoading || (isLecturer && isCourseLoading);
 
   const hasSections = sections.length > 0;
 
@@ -36,7 +46,7 @@ const ContentSection = () => {
         </Button>
       )}
 
-      {isLoading ? (
+      {isContentLoading ? (
         Array.from({ length: 3 }).map((_, i) => <SectionCardSkeleton key={i} />)
       ) : !hasSections ? (
         <div className="bg-white border border-gray-100 rounded-2xl shadow-sm">
@@ -65,6 +75,7 @@ const ContentSection = () => {
             section={section}
             index={index}
             defaultOpen={index === 0}
+            teacherRole={course?.role as string}
           />
         ))
       )}

@@ -12,10 +12,13 @@ export interface Department {
   updated_at: string;
 }
 
+type TeacherRole = "primary_lecturer" | "assistant_lecturer" | "lab_instructor";
+
 export interface Teacher {
   id: number;
   title: string;
   speciality: string;
+  role: TeacherRole;
   user: User;
   created_at: string;
   updated_at: string;
@@ -25,6 +28,7 @@ export interface Course {
   id: number;
   name: string;
   code: string;
+  role: string;
   credit_hours: number;
   year_level: number;
   is_active: number;
@@ -68,6 +72,7 @@ export interface SectionItem {
   type: string;
   url: string;
   description: string | null;
+  created_by_teacher_id: number;
   size: string;
   material_file_type: string;
   material_file_url: string;
@@ -107,12 +112,14 @@ export interface CourseSection {
     year_level: number;
     is_active: number;
     department_id: number;
+    role?: string | null;
     semester: string;
     created_at: string;
     updated_at: string;
   };
   items: SectionItem[];
   submissions: Submission[];
+  teacher: Teacher;
   created_at: string;
   updated_at: string;
 }
@@ -185,7 +192,7 @@ export interface Submission {
 export interface CourseTeacherPivot {
   course_id: number;
   teacher_id: number;
-  role: "primary_lecturer" | "assistant" | "guest_lecturer";
+  role: "primary_lecturer" | "assistant_lecturer" | "lab_instructor";
   created_at: string;
   updated_at: string;
 }
@@ -202,3 +209,4 @@ export interface CourseTeacher {
 }
 
 export type GetCourseTeachersResponse = ApiResponse<{ data: CourseTeacher[] }>;
+export type GetCourseSectionsResponse = ApiResponse<CourseSection[]>;
