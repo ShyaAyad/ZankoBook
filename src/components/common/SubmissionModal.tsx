@@ -13,6 +13,7 @@ const SubmissionModal = ({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [dueTime, setDueTime] = useState("");
   const [weight, setWeight] = useState("");
   const [maxMark, setMaxMark] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -29,7 +30,7 @@ const SubmissionModal = ({
       addAssignment(sectionId, {
         title,
         description,
-        due_at: dueDate,
+        due_at: `${dueDate}T${dueTime}`,
         weight,
         max_mark: maxMark,
         files,
@@ -45,9 +46,9 @@ const SubmissionModal = ({
   };
 
   const handleSubmit = () => {
-    if (!title || !description || !dueDate || !weight || !maxMark) {
+    if (!title || !description || !dueDate || !dueTime || !weight || !maxMark) {
       setValidationError(
-        "Title, description, due date/time, weight, and max mark are required.",
+        "Title, description, due date, due time, weight, and max mark are required.",
       );
       return;
     }
@@ -86,13 +87,26 @@ const SubmissionModal = ({
           className="w-full border border-gray-200 rounded-xl px-4 py-3 mb-4 outline-none focus:border-teal-400 resize-none"
         />
 
-        <label className="block text-sm font-semibold mb-2">Due date</label>
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-teal-400"
-        />
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label className="block text-sm font-semibold mb-2">Due date</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-teal-400"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-2">Due time</label>
+            <input
+              type="time"
+              value={dueTime}
+              onChange={(e) => setDueTime(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-teal-400"
+            />
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
