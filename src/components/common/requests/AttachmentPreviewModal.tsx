@@ -16,8 +16,10 @@ const AttachmentPreviewModal = ({
   onClose,
 }: AttachmentPreviewModalProps) => {
   const { t } = useTranslation();
-  const isImage = activeAttachment.type.startsWith("image/");
-  const isPdf = activeAttachment.type === "application/pdf";
+
+  const openInNewTab = () => {
+    window.open(activeAttachment.url, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div
@@ -55,39 +57,17 @@ const AttachmentPreviewModal = ({
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center p-4">
-          {isImage && (
-            <img
-              src={activeAttachment.url}
-              alt={activeAttachment.name}
-              className="max-w-full max-h-[60vh] object-contain rounded-md"
-            />
-          )}
-          {isPdf && (
-            <iframe
-              src={activeAttachment.url}
-              title={activeAttachment.name}
-              className="w-full h-[60vh] rounded-md bg-white"
-            />
-          )}
-          {!isImage && !isPdf && (
-            <div className="flex flex-col items-center gap-3 text-gray-500 py-10">
-              <FileText className="w-10 h-10" />
-              <p className="text-sm">
-                {t(
-                  "requestCard.noPreview",
-                  "No preview available for this file type.",
-                )}
-              </p>
-              <a
-                href={activeAttachment.url}
-                download={activeAttachment.name}
-                className="text-sm font-semibold text-teal-600 hover:text-teal-700"
-              >
-                {t("requestCard.downloadFile", "Download file")}
-              </a>
-            </div>
-          )}
+        <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center p-8">
+          <button
+            type="button"
+            onClick={openInNewTab}
+            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-teal-600"
+          >
+            <FileText className="w-4 h-4 shrink-0" />
+            <span className="truncate max-w-xs underline-offset-2 hover:underline">
+              {activeAttachment.name}
+            </span>
+          </button>
         </div>
 
         {attachments.length > 1 && (
