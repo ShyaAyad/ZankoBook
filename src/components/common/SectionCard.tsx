@@ -110,8 +110,8 @@ const SectionCard = ({
 
   // getting the roles
   const isPrimaryLecturer = teacherRole === "primary_lecturer";
-  const isAssistantLecturer = teacherRole === "assistant_lecturer";
-  const isLabInstructor = teacherRole === "lab_instructor";
+  // const isAssistantLecturer = teacherRole === "assistant_lecturer";
+  // const isLabInstructor = teacherRole === "lab_instructor";
 
   // getting teacher id
   const teacherId = section?.teacher.user.id;
