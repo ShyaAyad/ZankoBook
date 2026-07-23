@@ -22,8 +22,6 @@ const SubmissionPreviewModal = ({
   const queryClient = useQueryClient();
 
   const active = attachments[activeIndex];
-  const isImage = active?.file_type?.startsWith("image/");
-  const isPdf = active?.file_type === "application/pdf";
 
   const {
     mutate: replaceSubmission,
@@ -70,6 +68,10 @@ const SubmissionPreviewModal = ({
 
   if (!active) return null;
 
+  const openInNewTab = () => {
+    window.open(active.file_url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
@@ -105,29 +107,17 @@ const SubmissionPreviewModal = ({
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center p-4">
-          {isImage && (
-            <img
-              src={active.file_url}
-              alt={active.file_name}
-              className="max-w-full max-h-[50vh] object-contain rounded-md"
-            />
-          )}
-          {isPdf && (
-            <iframe
-              src={active.file_url}
-              title={active.file_name}
-              className="w-full h-[50vh] rounded-md bg-white"
-            />
-          )}
-          {!isImage && !isPdf && (
-            <div className="flex flex-col items-center gap-3 text-gray-500 py-10">
-              <FileText className="w-10 h-10" />
-              <p className="text-sm">
-                No preview available for this file type.
-              </p>
-            </div>
-          )}
+        <div className="flex-1 overflow-auto bg-gray-50 flex items-center justify-center p-8">
+          <button
+            type="button"
+            onClick={openInNewTab}
+            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-teal-600"
+          >
+            <FileText className="w-4 h-4 shrink-0" />
+            <span className="truncate max-w-xs underline-offset-2 hover:underline">
+              {active.file_name}
+            </span>
+          </button>
         </div>
 
         {attachments.length > 1 && (
