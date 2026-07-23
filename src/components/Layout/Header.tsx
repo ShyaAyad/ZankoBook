@@ -82,29 +82,34 @@ const Header = () => {
 
       <div className="flex h-full min-w-0 flex-1 items-center justify-between gap-5 bg-card px-6.5 max-md:h-auto max-md:flex-wrap max-md:p-4">
         <div className="flex gap-10">
-          {navItems.map((item) => {
-            const isPrefixActive = item.matchPrefixes?.some((prefix) =>
-              location.pathname.startsWith(prefix),
-            );
+          {navItems
+            .filter(
+              (item) =>
+                !(item.to === "/calendar" && user?.roles[0]?.name === "lecturer"),
+            )
+            .map((item) => {
+              const isPrefixActive = item.matchPrefixes?.some((prefix) =>
+                location.pathname.startsWith(prefix),
+              );
 
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === "/"}
-                className={({ isActive }) =>
-                  cn(
-                    buttonVariants({ variant: "ghost" }),
-                    isActive || isPrefixActive
-                      ? "bg-teal-200 text-teal-700 font-bold hover:bg-teal-200 hover:text-teal-500"
-                      : "text-muted-foreground hover:bg-white hover:text-foreground",
-                  )
-                }
-              >
-                {item.label}
-              </NavLink>
-            );
-          })}
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === "/"}
+                  className={({ isActive }) =>
+                    cn(
+                      buttonVariants({ variant: "ghost" }),
+                      isActive || isPrefixActive
+                        ? "bg-teal-200 text-teal-700 font-bold hover:bg-teal-200 hover:text-teal-500"
+                        : "text-muted-foreground hover:bg-white hover:text-foreground",
+                    )
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              );
+            })}
         </div>
 
         <div className="flex items-end justify-center">

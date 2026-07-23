@@ -1,36 +1,38 @@
 import api from "@/lib/axios";
 import type {
+  AssignmentDetails,
+  AssignmentEvent,
   CalendarEventsQueryParams,
+  GetAssignmentDetailsResponse,
   GetCalendarEventsResponse,
 } from "@/types/calendar";
-import type { EventInput } from "@fullcalendar/core";
 
 export async function getCalendarEvents(
   payload: CalendarEventsQueryParams,
-): Promise<EventInput[]> {
+): Promise<AssignmentEvent[]> {
   const response = await api.get<GetCalendarEventsResponse>(
-    `/api/moodle/calendar-events?start_date=${payload.startDate}&end_date=${payload.endDate}`,
+    "/api/moodle/calendar-events",
+    {
+      params: {
+        start_date: payload.startDate,
+        end_date: payload.endDate,
+      },
+    },
   );
 
   const { success, message, data } = response.data;
+  if (!success) throw new Error(message || "Calendar events could not be loaded");
+  return data;
+}
 
-  if (!success) throw new Error(message);
+export async function getAssignmentDetails(
+  assignmentId: number,
+): Promise<AssignmentDetails> {
+  const response = await api.get<GetAssignmentDetailsResponse>(
+    `/api/moodle/section-submissions/${assignmentId}`,
+  );
 
-  // Map the events to the format expected by FullCalendar
-  return data.map((event) => ({
-    id: event.id.toString(),
-    title: event.title,
-    start: event.due_at,
-    allDay: false,
-
-    // Everything else can live here
-    extendedProps: {
-      assignmentId: event.assessment_id,
-      description: event.description,
-      course: event.course,
-      isSubmitted: event.is_submitted,
-      isOverdue: event.is_overdue,
-      submission: event.submission,
-    },
-  }));
+  const { success, message, data } = response.data;
+  if (!success) throw new Error(message || "Assignment details could not be loaded");
+  return data;
 }
