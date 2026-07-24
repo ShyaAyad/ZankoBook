@@ -8,9 +8,11 @@ import {
   StickyNote,
   Pen,
   Trash,
+  CalendarClock,
+  Paperclip,
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CourseSection, SectionItem } from "@/types/course";
+import type { CourseSection, SectionItem, Submission } from "@/types/course";
 import { useUserStore } from "@/store/userStore";
 import { deleteSection } from "@/api/courseSection";
 import SubmissionModal from "./SubmissionModal";
@@ -18,6 +20,7 @@ import EditSectionModal from "./EditSectionModal";
 import MaterialModal from "./MaterialModal";
 import { Button } from "../ui/button";
 import { deleteSectionItem } from "@/api/sectionItem";
+import { deleteAssignment } from "@/api/assignments/sectionSubmissions";
 import EditMaterialModal from "./EditMaterialModal";
 import GradeSubmissionModal from "./GradeSubmissionModal";
 import StudentSubmissionRow from "./StudentSubmissionRow";
@@ -95,6 +98,8 @@ const SectionCard = ({
     "material" | "submission" | "edit" | null
   >(null);
   const [editingItem, setEditingItem] = useState<SectionItem | null>(null);
+  const [editingSubmission, setEditingSubmission] = useState<Submission | null>(null);
+  const [expandedSubmissionIds, setExpandedSubmissionIds] = useState<Set<number>>(new Set());
   const [expandedItemIds, setExpandedItemIds] = useState<Set<number>>(
     new Set(),
   );
@@ -162,6 +167,22 @@ const SectionCard = ({
       return next;
     });
   };
+
+  const toggleSubmission = (submissionId: number) => {
+    setExpandedSubmissionIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(submissionId)) next.delete(submissionId);
+      else next.add(submissionId);
+      return next;
+    });
+  };
+
+  const { mutate: removeAssignment, isPending: isDeletingAssignment } = useMutation({
+    mutationFn: (submissionId: number) => deleteAssignment(submissionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["course-sections"] });
+    },
+  });
 
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
@@ -321,34 +342,105 @@ const SectionCard = ({
 
             {section.submissions.map((submission) => {
               const assessment = submission.course_assessment;
+              const isExpanded = expandedSubmissionIds.has(submission.id);
 
-              if (
-                (isLecturer && isAllowedToModify) ||
-                (isLecturer && isPrimaryLecturer)
-              ) {
+              if (isLecturer && (isAllowedToModify || isPrimaryLecturer)) {
                 return (
-                  <div
-                    key={`submission-${submission.id}`}
-                    className="flex items-center justify-between py-4 gap-4"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-bold text-sm truncate">
-                        {assessment.title}
-                      </p>
+                  <div key={`submission-${submission.id}`} className="py-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <button
+                        type="button"
+                        onClick={() => toggleSubmission(submission.id)}
+                        className="flex items-center gap-3 min-w-0 text-left"
+                      >
+                        <div className="w-11 h-11 shrink-0 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                          <FileText size={20} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm truncate">{assessment.title}</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-orange-600 flex items-center gap-1.5">
+                            <span className="w-1 h-1 rounded-full bg-current" />
+                            Submission
+                            {submission.attachments.length > 0 && (
+                              <span className="text-gray-400 normal-case font-medium">
+                                · {submission.attachments.length} attachment{submission.attachments.length > 1 ? "s" : ""}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </button>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => toggleSubmission(submission.id)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500"
+                          aria-label={isExpanded ? "Hide details" : "Show details"}
+                        >
+                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingSubmission(submission)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-gray-50 text-gray-500"
+                          aria-label="Edit submission"
+                        >
+                          <Pen size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isDeletingAssignment}
+                          onClick={() => {
+                            if (window.confirm("Delete this submission and all of its attachments?")) {
+                              removeAssignment(submission.id);
+                            }
+                          }}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 bg-white hover:bg-orange-50 hover:text-orange-600 hover:border-transparent text-gray-500 disabled:opacity-60"
+                          aria-label="Delete submission"
+                        >
+                          <Trash size={14} />
+                        </button>
+                        <button
+                          onClick={async () => {
+                            const data = await getStudentSubmissions(assessment.id);
+                            setGradingAttachments(data);
+                            setGradingContext({ assessmentId: assessment.id, maxScore: assessment.max_mark });
+                          }}
+                          className="bg-teal-600 hover:bg-teal-700 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg"
+                        >
+                          Grade
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      onClick={async () => {
-                        const data = await getStudentSubmissions(assessment.id);
-                        setGradingAttachments(data);
-                        setGradingContext({
-                          assessmentId: assessment.id,
-                          maxScore: assessment.max_mark,
-                        });
-                      }}
-                      className="bg-teal-600 hover:bg-teal-700 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg shrink-0"
-                    >
-                      Grade
-                    </button>
+
+                    {isExpanded && (
+                      <div className="mt-3 ml-14 bg-gray-50 border border-gray-100 rounded-xl px-4 py-4 space-y-3">
+                        {submission.description && (
+                          <p className="text-sm text-gray-600 whitespace-pre-wrap">{submission.description}</p>
+                        )}
+                        <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-gray-500">
+                          <span className="flex items-center gap-1.5"><CalendarClock size={14} /> Due {assessment.due_at}</span>
+                          <span>Max mark: {assessment.max_mark}</span>
+                          <span>Weight: {assessment.weight}</span>
+                        </div>
+                        {submission.attachments.length > 0 && (
+                          <div className="space-y-2">
+                            {submission.attachments.map((attachment) => (
+                              <a
+                                key={attachment.id}
+                                href={attachment.file_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800"
+                              >
+                                <Paperclip size={14} />
+                                <span className="truncate">{attachment.file_name}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               }
@@ -364,10 +456,7 @@ const SectionCard = ({
                   grade={async () => {
                     const data = await getStudentSubmissions(assessment.id);
                     setGradingAttachments(data);
-                    setGradingContext({
-                      assessmentId: assessment.id,
-                      maxScore: assessment.max_mark,
-                    });
+                    setGradingContext({ assessmentId: assessment.id, maxScore: assessment.max_mark });
                   }}
                 />
               );
@@ -406,6 +495,13 @@ const SectionCard = ({
         <SubmissionModal
           sectionId={section.id}
           onClose={() => setActiveModal(null)}
+        />
+      )}
+      {editingSubmission && (
+        <SubmissionModal
+          sectionId={section.id}
+          assignment={editingSubmission}
+          onClose={() => setEditingSubmission(null)}
         />
       )}
       {activeModal === "edit" && (
