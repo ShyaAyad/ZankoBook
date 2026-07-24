@@ -401,14 +401,16 @@ const SectionCard = ({
                           <Trash size={14} />
                         </button>
                         <button
+                          disabled={Date.now() <= new Date(assessment.due_at.replace(" ", "T")).getTime()}
                           onClick={async () => {
-                            const data = await getStudentSubmissions(assessment.id);
+                            const data = await getStudentSubmissions(submission.id);
                             setGradingAttachments(data);
                             setGradingContext({ assessmentId: assessment.id, maxScore: assessment.max_mark });
                           }}
-                          className="bg-teal-600 hover:bg-teal-700 transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg"
+                          title={Date.now() <= new Date(assessment.due_at.replace(" ", "T")).getTime() ? "Available after the deadline" : "View and grade submissions"}
+                          className="bg-teal-600 hover:bg-teal-700 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors text-white font-semibold text-sm px-5 py-2 rounded-lg"
                         >
-                          Grade
+                          View submissions
                         </button>
                       </div>
                     </div>
@@ -450,11 +452,13 @@ const SectionCard = ({
                   key={`submission-${submission.id}`}
                   submissionId={submission.id}
                   assessment={assessment}
+                  description={submission.description}
+                  attachments={submission.attachments}
                   isLecturer={isLecturer}
                   isPrimaryLecturer={isPrimaryLecturer}
                   isAllowedToModify={isAllowedToModify}
                   grade={async () => {
-                    const data = await getStudentSubmissions(assessment.id);
+                    const data = await getStudentSubmissions(submission.id);
                     setGradingAttachments(data);
                     setGradingContext({ assessmentId: assessment.id, maxScore: assessment.max_mark });
                   }}
