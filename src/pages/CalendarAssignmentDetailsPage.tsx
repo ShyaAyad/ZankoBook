@@ -10,6 +10,7 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { getAssignmentDetails } from "@/api/calendar";
 import { useUserStore } from "@/store/userStore";
+import StudentSubmissionPanel from "@/components/common/StudentSubmissionPanel";
 
 function formatDateTime(value: string): string {
   return new Date(value.replace(" ", "T")).toLocaleString([], {
@@ -156,6 +157,11 @@ export default function CalendarAssignmentDetailsPage() {
               </div>
             )}
           </section>
+
+          <StudentSubmissionPanel
+            submissionId={query.data.id}
+            dueAt={query.data.course_assessment.due_at}
+          />
         </div>
       )}
     </div>
